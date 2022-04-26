@@ -7,6 +7,8 @@ NUM_HIDDEN = 40  # Number of hidden neurons
 NUM_OUTPUT = 10  # Number of output neurons
 NUM_CHECK = 5  # Number of examples on which to check the gradient
 
+
+MINIBATCH_SIZE = 16
 # Given a vector w containing all the weights and biased vectors, extract
 # and return the individual weights and biases W1, b1, W2, b2.
 # This is useful for performing a gradient check with check_grad.
@@ -38,7 +40,7 @@ def pack (W1, b1, W2, b2):
 # Load the images and labels from a specified dataset (train or test).
 def loadData (which):
     images = np.load("fashion_mnist_{}_images.npy".format(which)).T / 255.
-    labels = np.load("fashion_mnist_{}_labels.npy".format(which)))
+    labels = np.load("fashion_mnist_{}_labels.npy".format(which))
 
     # TODO: Convert labels vector to one-hot matrix (C x N).
     # ...
