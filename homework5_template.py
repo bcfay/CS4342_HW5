@@ -8,17 +8,19 @@ NUM_INPUT = 784  # Number of input neurons
 NUM_OUTPUT = 10  # Number of output neurons
 NUM_CHECK = 5  # Number of examples on which to check the gradient
 
-NUM_HIDDEN = 0  # Number of hidden neurons [HYPERPARAMETER TUNING VALUE]
-LEARNING_RATE = 0  # [HYPERPARAMETER TUNING VALUE]
-MINIBATCH_SIZE = 0  # [HYPERPARAMETER TUNING VALUE]
-EPOCH_NUM = 0  # [HYPERPARAMETER TUNING VALUE]
-REGULARIZATION_STRENGTH = 0  # [HYPERPARAMETER TUNING VALUE]
-
 NUM_HIDDEN_OPTIONS = [30, 40, 50]
 LEARNING_RATE_OPTIONS = [.001, .005, .01, .05, .1, .5]
 MINIBATCH_SIZE_OPTIONS = [16, 32, 64, 128, 256]
 EPOCH_NUM_OPTIONS = [1, 2, 4, 8]
 REGULARIZATION_STRENGTH_OPTIONS = [.05, .1, .5]
+
+NUM_HIDDEN = NUM_HIDDEN_OPTIONS[0]  # Number of hidden neurons [HYPERPARAMETER TUNING VALUE]
+LEARNING_RATE = LEARNING_RATE_OPTIONS[0]  # [HYPERPARAMETER TUNING VALUE]
+MINIBATCH_SIZE = MINIBATCH_SIZE_OPTIONS[0]  # [HYPERPARAMETER TUNING VALUE]
+EPOCH_NUM = EPOCH_NUM_OPTIONS[0]  # [HYPERPARAMETER TUNING VALUE]
+REGULARIZATION_STRENGTH = REGULARIZATION_STRENGTH_OPTIONS[0]  # [HYPERPARAMETER TUNING VALUE]
+
+
 
 
 # Given a vector w containing all the weights and biased vectors, extract
@@ -93,6 +95,7 @@ def gradCE(X, Y, w):
     deltaW1 = deltaB1 * X.T
 
     return pack(deltaW1, deltaB1, deltaW2, deltaB2)
+
 
 def relu(z):
     return max(0.0, z)
@@ -199,6 +202,7 @@ def findBestHyperparaneters(trainX, trainY, w):
     REGULARIZATION_STRENGTH = best_REGULARIZATION_STRENGTH
 
     return best_w
+
 
 if __name__ == "__main__":
     # Load data
