@@ -11,7 +11,7 @@ NUM_CHECK = 5  # Number of examples on which to check the gradient
 NUM_HIDDEN = 0  # Number of hidden neurons [HYPERPARAMETER TUNING VALUE]
 LEARNING_RATE = 0  # [HYPERPARAMETER TUNING VALUE]
 MINIBATCH_SIZE = 0  # [HYPERPARAMETER TUNING VALUE]
-EPOCH_NUM` = 0  # [HYPERPARAMETER TUNING VALUE]
+EPOCH_NUM = 0  # [HYPERPARAMETER TUNING VALUE]
 REGULARIZATION_STRENGTH = 0  # [HYPERPARAMETER TUNING VALUE]
 
 NUM_HIDDEN_OPTIONS = [30, 40, 50]
@@ -93,6 +93,9 @@ def gradCE(X, Y, w):
     deltaW1 = deltaB1 * X.T
 
     return pack(deltaW1, deltaB1, deltaW2, deltaB2)
+
+def relu(z):
+    return max(0.0, z)
 
 
 def reluPrime(z):
