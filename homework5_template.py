@@ -106,13 +106,18 @@ def fCE(X, Y, w):
     return cost, acc, z1, h1, W1, W2, yhat[
                                       0:n]  # deciding whether or not to "clip" off the bias on yhat (see the [0 to n] )
 
+
 def fPC(y, yhat):
-    #eq = y==yhat
-    n  =  y.shape[0]
+    # eq = y==yhat
+    n = y.shape[0]
     y_maxes = np.argmax(y, axis=1)
     yhat_maxes = np.argmax(yhat, axis=1)
-    return np.count_nonzero(y_maxes==yhat_maxes)
-    #return eq
+    pc = np.count_nonzero(y_maxes == yhat_maxes) / n
+    return pc
+
+    # return eq
+
+
 # Given training images X, associated labels Y, and a vector of combined weights
 # and bias terms w, compute and return the gradient of fCE. You might
 # want to extend this function to return multiple arguments (in which case you
