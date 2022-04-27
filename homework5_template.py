@@ -95,18 +95,21 @@ def fCE(X, Y, w):
     h1 = relu_vec(z1)
     z2 = np.dot(W2, h1)
     # z2 = np.vstack((z2.T, b2.T))
-    yhat = np.exp(z2) / np.exp(z2)
+    yhat = np.exp(z2) / np.sum(np.exp(z2), axis=0)
 
     smallSum = np.dot(Y, np.log(yhat))
     bigSum = np.sum(smallSum, axis=0)
     loss = (-1 / n) * bigSum
-    acc = -1 # TODO calculate
+    acc = fPC(y, yhat)
 
     cost = loss
     return cost, acc, z1, h1, W1, W2, yhat[
                                       0:n]  # deciding whether or not to "clip" off the bias on yhat (see the [0 to n] )
 
+def fPC(y, yhat):
+    eq = y==yhat
 
+    return eq
 # Given training images X, associated labels Y, and a vector of combined weights
 # and bias terms w, compute and return the gradient of fCE. You might
 # want to extend this function to return multiple arguments (in which case you
