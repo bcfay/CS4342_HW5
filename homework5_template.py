@@ -8,7 +8,7 @@ NUM_INPUT = 784  # Number of input neurons
 NUM_OUTPUT = 10  # Number of output neurons
 NUM_CHECK = 5  # Number of examples on which to check the gradient
 
-GLOBAL_DEBUG = False
+GLOBAL_DEBUG = True
 
 cost = 0.0
 acc = 0.0
@@ -326,6 +326,7 @@ if __name__ == "__main__":
     #     scipy.optimize.check_grad(lambda w_: fCE(np.atleast_2d(trainX[:, idxs]), np.atleast_2d(trainY[idxs]), w_)[0], \
     #                               lambda w_: gradCE(np.atleast_2d(trainX[:, idxs]), np.atleast_2d(trainY[idxs]), w_), \
     #                               w))
-
+    w = train(trainX, trainY, w)
+    findBestHyperparaneters(trainX, trainY, w)
     # Train the network using SGD.
-    train(trainX, trainY, w)
+
