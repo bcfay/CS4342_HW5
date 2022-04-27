@@ -68,7 +68,6 @@ def loadData(which):
     return images, labels_OH
 
 
-
 # Given training images X, associated labels Y, and a vector of combined weights
 # and bias terms w, compute and return the cross-entropy (CE) loss, accuracy,
 # as well as the intermediate values of the NN.
@@ -106,13 +105,18 @@ def fCE(X, Y, w):
     return cost, acc, z1, h1, W1, W2, yhat[
                                       0:n]  # deciding whether or not to "clip" off the bias on yhat (see the [0 to n] )
 
+
 def fPC(y, yhat):
-    #eq = y==yhat
-    n  =  y.shape[0]
+    # eq = y==yhat
+    n = y.shape[0]
     y_maxes = np.argmax(y, axis=1)
     yhat_maxes = np.argmax(yhat, axis=1)
-    return np.count_nonzero(y_maxes==yhat_maxes)
-    #return eq
+    pc = np.count_nonzero(y_maxes == yhat_maxes) / n
+    return pc
+
+    # return eq
+
+
 # Given training images X, associated labels Y, and a vector of combined weights
 # and bias terms w, compute and return the gradient of fCE. You might
 # want to extend this function to return multiple arguments (in which case you
@@ -143,7 +147,7 @@ def gradCE(X, Y, w):
     return pack(deltaW1, deltaB1, deltaW2, deltaB2)
 
 
-relu = lambda z:max(0.0, z)
+relu = lambda z: max(0.0, z)
 
 
 # def relu(z):
@@ -156,21 +160,23 @@ def reluPrime(z):
     else:
         return 0
 
+
 def calc_yhat(X, Y, w):
     cost, acc, yhat = 0, 0, 0
     W1, b1, W2, b2 = unpack(w)
     n = X.shape[1]
 
-    yhat = (W2*W1)*X + W2 * b1 +b2
+    yhat = (W2 * W1) * X + W2 * b1 + b2
 
     smallSum = np.dot(Y, np.log(yhat))
     bigSum = np.sum(smallSum, axis=0)
     loss = (-1 / n) * bigSum
-    acc = -1 # TODO calculate
+    acc = -1  # TODO calculate
 
     cost = loss
 
     return cost, acc, yhat
+
 
 # Given training and testing datasets and an initial set of weights/biases b,
 # train the NN.
