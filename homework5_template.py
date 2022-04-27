@@ -98,8 +98,7 @@ def fCE(X, Y, w):
     acc = -1
 
     cost = loss
-    return cost, acc, z1, h1, W1, W2, yhat[
-                                      0:n]  # deciding whether or not to "clip" off the bias on yhat (see the [0 to n] )
+    return cost, acc, z1, h1, W1, W2, yhat[0:n]  # deciding whether or not to "clip" off the bias on yhat (see the [0 to n] )
 
 
 # Given training images X, associated labels Y, and a vector of combined weights
@@ -109,7 +108,8 @@ def fCE(X, Y, w):
 def gradCE(X, Y, w):
     W1, b1, W2, b2 = unpack(w)
 
-    cost, acc, z1, h1, W1, W2, yhat = fCE(X, Y, w)
+    # cost, acc, z1, h1, W1, W2, yhat = fCE(X, Y, w)
+    cost, acc, z1, h1, W1, W2, yhat = (1, 1, np.ones(NUM_HIDDEN), np.ones(NUM_HIDDEN), np.empty_like(W1), np.empty_like(W2), np.empty_like(Y))
     print("Y shape = ", Y.shape)
     print("y^hat shape = ", yhat.shape)
     deltaB2 = (yhat - Y)
@@ -193,6 +193,8 @@ def findBestHyperparaneters(trainX, trainY, w):
     best_EPOCH_NUM = 0
     best_REGULARIZATION_STRENGTH = 0
 
+    # TODO get validation data to test with
+
     for a in range(NUM_HIDDEN_OPTIONS_len):
         NUM_HIDDEN = NUM_HIDDEN_OPTIONS[a]
         for b in range(LEARNING_RATE_OPTIONS_len):
@@ -244,7 +246,10 @@ if __name__ == "__main__":
 
     # Check that the gradient is correct on just a few examples (randomly drawn).
     idxs = np.random.permutation((trainX.T).shape[0])[0:NUM_CHECK]
-    anal_grad = gradCE(np.atleast_2d(trainX[idxs]), np.atleast_2d(trainY.T[idxs]), w)
+
+    code_test_x = np.atleast_2d(trainX[idxs])
+    code_test_y = np.atleast_2d(trainY[idxs])
+    anal_grad = gradCE(code_test_x, code_test_y, w)
     print(anal_grad)
 
     # testMyFCE = fCE(np.atleast_2d(trainX[idxs]), np.atleast_2d(trainY[idxs]), w)[0]
@@ -254,7 +259,7 @@ if __name__ == "__main__":
 
     print("Numerical gradient:")
     print(scipy.optimize.approx_fprime(w, lambda w_:
-    fCE(np.atleast_2d(trainX[idxs]), np.atleast_2d(trainY[idxs]), w_)[1], 1e-10))
+    fCE(code_test_x, np.atleast_2d(trainY[idxs]), w_)[1], 1e-10))
     print("Analytical gradient:")
     print(anal_grad)
     print("Discrepancy:")
