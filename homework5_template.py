@@ -100,7 +100,7 @@ def fCE(X, Y, w):
     smallSum = np.dot(Y, np.log(yhat))
     bigSum = np.sum(smallSum, axis=0)
     loss = (-1 / n) * bigSum
-    acc = -1
+    acc = -1 # TODO calculate
 
     cost = loss
     return cost, acc, z1, h1, W1, W2, yhat[
@@ -150,8 +150,20 @@ def reluPrime(z):
     else:
         return 0
 
-def calc_yhat(trainX, trainY, w):
+def calc_yhat(X, Y, w):
     cost, acc, yhat = 0, 0, 0
+    W1, b1, W2, b2 = unpack(w)
+    n = X.shape[1]
+
+    yhat = (W2*W1)*X + W2 * b1 +b2
+
+    smallSum = np.dot(Y, np.log(yhat))
+    bigSum = np.sum(smallSum, axis=0)
+    loss = (-1 / n) * bigSum
+    acc = -1 # TODO calculate
+
+    cost = loss
+
     return cost, acc, yhat
 
 # Given training and testing datasets and an initial set of weights/biases b,
