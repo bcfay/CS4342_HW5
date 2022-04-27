@@ -243,18 +243,19 @@ if __name__ == "__main__":
     w = pack(W1, b1, W2, b2)
 
     # Check that the gradient is correct on just a few examples (randomly drawn).
-    idxs = np.random.permutation(trainX.shape[0])[0:NUM_CHECK]
+    idxs = np.random.permutation((trainX.T).shape[0])[0:NUM_CHECK]
+    print(trainX[idxs])
 
-    testMyFCE = fCE(np.atleast_2d(trainX[:, idxs]), np.atleast_2d(trainY[idxs]), w)[0]
+    testMyFCE = fCE(np.atleast_2d(trainX[idxs]), np.atleast_2d(trainY[idxs]), w)[0]
     print(testMyFCE)
 
     print("(main) Y shape = ", trainY.shape)
 
     print("Numerical gradient:")
     print(scipy.optimize.approx_fprime(w, lambda w_:
-    fCE(np.atleast_2d(trainX[:, idxs]), np.atleast_2d(trainY[idxs]), w_)[1], 1e-10))
+    fCE(np.atleast_2d(trainX[idxs]), np.atleast_2d(trainY[idxs]), w_)[1], 1e-10))
     print("Analytical gradient:")
-    print(gradCE(np.atleast_2d(trainX[:, idxs]), np.atleast_2d(trainY.T[idxs]), w))
+    print(gradCE(np.atleast_2d(trainX[idxs]), np.atleast_2d(trainY.T[idxs]), w))
     print("Discrepancy:")
     print(
         scipy.optimize.check_grad(lambda w_: fCE(np.atleast_2d(trainX[:, idxs]), np.atleast_2d(trainY[idxs]), w_)[0], \
