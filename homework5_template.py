@@ -68,6 +68,7 @@ def loadData(which):
     return images, labels_OH
 
 
+
 # Given training images X, associated labels Y, and a vector of combined weights
 # and bias terms w, compute and return the cross-entropy (CE) loss, accuracy,
 # as well as the intermediate values of the NN.
@@ -149,6 +150,9 @@ def reluPrime(z):
     else:
         return 0
 
+def calc_yhat(trainX, trainY, w):
+    cost, acc, yhat = 0, 0, 0
+    return cost, acc, yhat
 
 # Given training and testing datasets and an initial set of weights/biases b,
 # train the NN.
@@ -180,7 +184,7 @@ def train(trainX, trainY, w):
             gradient = gradCE(batch, batch_lables, w)
             w = w - LEARNING_RATE * gradient  # make element wise
 
-        cost, acc, z1, h1, W1, W2, yhat = fCE(trainX, trainY, w)
+        cost, acc, yhat = calc_yhat(trainX, trainY, w)
         print("Epoch: ", i, "Cross-entropy loss: ", cost, "PCC: ", acc)
         # out.append(f)
         # if (i % 50 == 0):
