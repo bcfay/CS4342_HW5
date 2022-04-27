@@ -143,7 +143,7 @@ def gradCE(X, Y, w):
     return pack(deltaW1, deltaB1, deltaW2, deltaB2)
 
 
-relu = lambda z:max(0.0, z)
+relu = lambda z: max(0.0, z)
 
 
 # def relu(z):
@@ -156,21 +156,24 @@ def reluPrime(z):
     else:
         return 0
 
+
 def calc_yhat(X, Y, w):
-    cost, acc, yhat = 0, 0, 0
     W1, b1, W2, b2 = unpack(w)
     n = X.shape[1]
 
-    yhat = (W2*W1)*X + W2 * b1 +b2
+    a = np.dot(W2, W1)
+    b = np.dot(W2, b1)
+    yhat = np.multiply(np.dot(a, X.T), (b + b2))
 
     smallSum = np.dot(Y, np.log(yhat))
     bigSum = np.sum(smallSum, axis=0)
     loss = (-1 / n) * bigSum
-    acc = -1 # TODO calculate
+    acc = -1  # TODO calculate
 
     cost = loss
 
     return cost, acc, yhat
+
 
 # Given training and testing datasets and an initial set of weights/biases b,
 # train the NN.
