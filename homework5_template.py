@@ -14,10 +14,10 @@ GLOBAL_DEBUG = False
 cost = 0.0
 acc = 0.0
 
-NUM_HIDDEN_OPTIONS = [30, 40, 50]
-LEARNING_RATE_OPTIONS = [.001, .005, .01, .05, .1, .5]
-MINIBATCH_SIZE_OPTIONS = [16, 32, 64, 128, 256]
-EPOCH_NUM_OPTIONS = [1, 2, 4, 8, 16, 32, 64]
+NUM_HIDDEN_OPTIONS = [30, 50]
+LEARNING_RATE_OPTIONS = [.005, .01, .05]
+MINIBATCH_SIZE_OPTIONS = [ 32, 64, 128]
+EPOCH_NUM_OPTIONS = [16, 32, 64]
 REGULARIZATION_STRENGTH_OPTIONS = [.05, .1, .5]
 
 NUM_HIDDEN = NUM_HIDDEN_OPTIONS[0]  # Number of hidden neurons [HYPERPARAMETER TUNING VALUE]
@@ -215,8 +215,6 @@ def train(trainX, trainY, w):
             gradient = gradCE(batch, batch_lables, w)
             w = w - LEARNING_RATE * gradient
             global cost, acc
-
-            file_name = 'HW5_plot_bus.csv'
             cost_output = cost
             acc_output = acc
             df = pd.DataFrame([[descent_step, cost_output, acc_output]])
@@ -239,7 +237,8 @@ def findBestHyperparaneters(trainX, trainY, w):
     REGULARIZATION_STRENGTH_OPTIONS_len = len(REGULARIZATION_STRENGTH_OPTIONS)
 
     print("---- FINDING OPTIMAL HYPERPARAMETER VALUES.  ----------")
-    total_len = (NUM_HIDDEN_OPTIONS_len * LEARNING_RATE_OPTIONS_len * MINIBATCH_SIZE_OPTIONS_len * EPOCH_NUM_OPTIONS_len * REGULARIZATION_STRENGTH_OPTIONS_len)
+    total_len = (
+                NUM_HIDDEN_OPTIONS_len * LEARNING_RATE_OPTIONS_len * MINIBATCH_SIZE_OPTIONS_len * EPOCH_NUM_OPTIONS_len * REGULARIZATION_STRENGTH_OPTIONS_len)
     print("Number of total iterations: ", total_len)
     iterationCounter = 0
     start_time = time.time()
@@ -250,7 +249,7 @@ def findBestHyperparaneters(trainX, trainY, w):
     best_MINIBATCH_SIZE = 0
     best_EPOCH_NUM = 0
     best_REGULARIZATION_STRENGTH = 0
-    global cost,acc
+    global cost, acc, NUM_HIDDEN, LEARNING_RATE, MINIBATCH_SIZE, EPOCH_NUM, REGULARIZATION_STRENGTH
     # TODO get validation data to test with
     validation_len = int(0.2 * data_len)
     # idxs = np.random.permutation((trainX.T).shape[0])[0:NUM_CHECK]
@@ -269,7 +268,7 @@ def findBestHyperparaneters(trainX, trainY, w):
                         validation_loss = fCE(trainX[validation_idx], trainY[validation_idx], w)[0]
 
                         print("Iteration ", iterationCounter)
-                        iterationCounter = iterationCounter+1;
+                        iterationCounter = iterationCounter + 1;
                         if (validation_loss < best_cost):
                             best_cost = validation_loss
                             best_w = w
