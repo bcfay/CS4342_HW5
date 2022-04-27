@@ -15,10 +15,10 @@ cost = 0.0
 acc = 0.0
 
 NUM_HIDDEN_OPTIONS = [40]
-LEARNING_RATE_OPTIONS = [.001, .005, .01]
-MINIBATCH_SIZE_OPTIONS = [ 64, 128, 256]
-EPOCH_NUM_OPTIONS = [32, 64]
-REGULARIZATION_STRENGTH_OPTIONS = [.01,.05]
+LEARNING_RATE_OPTIONS = [.0005, .001, .005]
+MINIBATCH_SIZE_OPTIONS = [64, 128]
+EPOCH_NUM_OPTIONS = [64, 128]
+REGULARIZATION_STRENGTH_OPTIONS = [.05, .1]
 
 NUM_HIDDEN = NUM_HIDDEN_OPTIONS[0]  # Number of hidden neurons [HYPERPARAMETER TUNING VALUE]
 LEARNING_RATE = LEARNING_RATE_OPTIONS[0]  # [HYPERPARAMETER TUNING VALUE]
@@ -88,21 +88,21 @@ def fCE(X, Y, w):
     bias_vector = np.atleast_2d(np.ones(sample_num)).T
     X = np.hstack((X, bias_vector))
 
-    n = X.shape[0]
+    example_n = X.shape[0]
     relu_vec = np.vectorize(relu)
 
-    z1 = np.dot(np.hstack((W1, np.atleast_2d(np.ones(W1.shape[0])).T)), X.T)
+    WandB1 = np.hstack((W1, np.atleast_2d(b1).T))
+    z1 = np.dot(WandB1, X.T)
     h1 = relu_vec(z1)
-    z2 = np.dot(W2, h1)
+    z2 = np.add(np.dot(W2, h1), np.atleast_2d(b2).T)
     # z2 = np.vstack((z2.T, b2.T))
     yhat = np.exp(z2) / np.sum(np.exp(z2), axis=0)
 
     bug = np.multiply(Y.T, np.log(yhat))
     smallSum = np.sum(bug, axis=0)
     bigSum = np.sum(smallSum, axis=0)
-    #alpha = 0.1
     alpha = REGULARIZATION_STRENGTH
-    loss = (-1 / n) * bigSum  + ((alpha/(2*n))*np.dot(w.T,w))
+    loss = (-1 / example_n) * bigSum + ((alpha / (2 * example_n)) * np.dot(w.T, w))
     global acc, cost
     acc = fPC(Y, yhat.T)
 
@@ -166,24 +166,6 @@ def reluPrime(z):
         return 0
 
 
-def calc_yhat(X, Y, w):
-    W1, b1, W2, b2 = unpack(w)
-    n = X.shape[1]
-
-    a = np.dot(W2, W1)
-    b = np.dot(W2, b1)
-    yhat = np.multiply(np.dot(a, X.T).T, (b + b2))
-
-    smallSum = np.dot(Y, np.log(yhat).T)
-    bigSum = np.sum(smallSum, axis=0)
-    loss = (-1 / n) * bigSum
-    acc = -1  # TODO calculate
-
-    cost = loss
-
-    return cost, acc, yhat
-
-
 # Given training and testing datasets and an initial set of weights/biases b,
 # train the NN.
 def train(trainX, trainY, w):
@@ -201,8 +183,8 @@ def train(trainX, trainY, w):
         print_i = 0
         for j in range(int(sample_num / MINIBATCH_SIZE) - 1):
             # select minibatch
-            batch = np.empty((MINIBATCH_SIZE, data_len))
-            batch_lables = np.empty((MINIBATCH_SIZE, class_len))
+            batch = np.zeros((MINIBATCH_SIZE, data_len))
+            batch_lables = np.zeros((MINIBATCH_SIZE, class_len))
 
             for k in range(MINIBATCH_SIZE):  # check for np optimization
                 if index_index < sample_num:
@@ -219,8 +201,7 @@ def train(trainX, trainY, w):
             df.to_csv(file_name, mode='a', header=False, index=False)
             descent_step += 1
 
-        # cost, acc, yhat = calc_yhat(trainX, trainY, w)
-        if(GLOBAL_DEBUG): print("Epoch: ", i, "Cross-entropy loss: ", cost, "PCC: ", acc)
+        if (GLOBAL_DEBUG): print("Epoch: ", i, "Cross-entropy loss: ", cost, "PCC: ", acc)
     return w
 
 
@@ -236,7 +217,7 @@ def findBestHyperparaneters(trainX, trainY, w):
 
     print("---- FINDING OPTIMAL HYPERPARAMETER VALUES.  ----------")
     total_len = (
-                NUM_HIDDEN_OPTIONS_len * LEARNING_RATE_OPTIONS_len * MINIBATCH_SIZE_OPTIONS_len * EPOCH_NUM_OPTIONS_len * REGULARIZATION_STRENGTH_OPTIONS_len)
+            NUM_HIDDEN_OPTIONS_len * LEARNING_RATE_OPTIONS_len * MINIBATCH_SIZE_OPTIONS_len * EPOCH_NUM_OPTIONS_len * REGULARIZATION_STRENGTH_OPTIONS_len)
     print("Number of total iterations: ", total_len)
     iterationCounter = 0
     start_time = time.time()
@@ -275,7 +256,8 @@ def findBestHyperparaneters(trainX, trainY, w):
                             best_MINIBATCH_SIZE = MINIBATCH_SIZE
                             best_EPOCH_NUM = EPOCH_NUM
                             best_REGULARIZATION_STRENGTH = REGULARIZATION_STRENGTH
-                            print("New best hyperparameters with validation loss of: ", best_cost, ". NUM_HIDDEN: ", NUM_HIDDEN,
+                            print("New best hyperparameters with validation loss of: ", best_cost, ". NUM_HIDDEN: ",
+                                  NUM_HIDDEN,
                                   " LEARNING_RATE: ", LEARNING_RATE, " MINIBATCH_SIZE: ", MINIBATCH_SIZE,
                                   " EPOCH_NUM: ", EPOCH_NUM, " REGULARIZATION_STRENGTH: ", REGULARIZATION_STRENGTH)
     print("Globals are now set to best hyperameter values out of available options")
@@ -285,7 +267,9 @@ def findBestHyperparaneters(trainX, trainY, w):
     MINIBATCH_SIZE = best_MINIBATCH_SIZE
     EPOCH_NUM = best_EPOCH_NUM
     REGULARIZATION_STRENGTH = best_REGULARIZATION_STRENGTH
-    print("The best hyperparameters with loss of ", best_cost, " are: NUM_HIDDEN: ", NUM_HIDDEN," LEARNING_RATE: ", LEARNING_RATE, " MINIBATCH_SIZE: ", MINIBATCH_SIZE, " EPOCH_NUM: ", EPOCH_NUM, " REGULARIZATION_STRENGTH: ", REGULARIZATION_STRENGTH)
+    print("The best hyperparameters with loss of ", best_cost, " are: NUM_HIDDEN: ", NUM_HIDDEN, " LEARNING_RATE: ",
+          LEARNING_RATE, " MINIBATCH_SIZE: ", MINIBATCH_SIZE, " EPOCH_NUM: ", EPOCH_NUM, " REGULARIZATION_STRENGTH: ",
+          REGULARIZATION_STRENGTH)
 
     return best_w
 
@@ -329,9 +313,10 @@ if __name__ == "__main__":
     # w = train(trainX, trainY, w)
     findBestHyperparaneters(trainX, trainY, w)
     print("Now training using best hyperparameters.")
-    print("NUM_HIDDEN: ", NUM_HIDDEN," LEARNING_RATE: ", LEARNING_RATE, " MINIBATCH_SIZE: ", MINIBATCH_SIZE, " EPOCH_NUM: ", EPOCH_NUM, " REGULARIZATION_STRENGTH: ", REGULARIZATION_STRENGTH)
+    print("NUM_HIDDEN: ", NUM_HIDDEN, " LEARNING_RATE: ", LEARNING_RATE, " MINIBATCH_SIZE: ", MINIBATCH_SIZE,
+          " EPOCH_NUM: ", EPOCH_NUM, " REGULARIZATION_STRENGTH: ", REGULARIZATION_STRENGTH)
     print("Now testing using best hyperparameters.")
     GLOBAL_DEBUG = True
     w = train(trainX, trainY, w)
-    cost, acc, z1, h1, W1, W2, yhat = fCE(testX, testY,w)
+    cost, acc, z1, h1, W1, W2, yhat = fCE(testX, testY, w)
     print("Testing accuracy: ", acc, "Testing CE loss", cost)
