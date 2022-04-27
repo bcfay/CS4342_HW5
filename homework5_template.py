@@ -54,7 +54,7 @@ def pack(W1, b1, W2, b2):
 # Load the images and labels from a specified dataset (train or test).
 # Return images and one hot lables
 def loadData(which):
-    images = np.load("fashion_mnist_{}_images.npy".format(which)).T / 255.
+    images = np.load("fashion_mnist_{}_images.npy".format(which)) / 255.
     labels = np.load("fashion_mnist_{}_labels.npy".format(which))
     data_len, sample_num = np.shape(images)
     lable_len = 10
@@ -65,7 +65,7 @@ def loadData(which):
             if labels[j] == i:
                 labels_OH[j][i] = 1
 
-    return images.T, labels_OH
+    return images, labels_OH
 
 
 # Given training images X, associated labels Y, and a vector of combined weights
