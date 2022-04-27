@@ -8,13 +8,14 @@ NUM_INPUT = 784  # Number of input neurons
 NUM_OUTPUT = 10  # Number of output neurons
 NUM_CHECK = 5  # Number of examples on which to check the gradient
 
-NUM_HIDDEN = 0  # Number of hidden neurons [HYPERPARAMETER TUNING VALUE]
+
 LEARNING_RATE = 0  # [HYPERPARAMETER TUNING VALUE]
 MINIBATCH_SIZE = 0  # [HYPERPARAMETER TUNING VALUE]
 EPOCH_NUM = 0  # [HYPERPARAMETER TUNING VALUE]
 REGULARIZATION_STRENGTH = 0  # [HYPERPARAMETER TUNING VALUE]
 
 NUM_HIDDEN_OPTIONS = [30, 40, 50]
+NUM_HIDDEN = NUM_HIDDEN_OPTIONS[0]  # Number of hidden neurons [HYPERPARAMETER TUNING VALUE]
 LEARNING_RATE_OPTIONS = [.001, .005, .01, .05, .1, .5]
 MINIBATCH_SIZE_OPTIONS = [16, 32, 64, 128, 256]
 EPOCH_NUM_OPTIONS = [1, 2, 4, 8]
@@ -73,9 +74,31 @@ def loadData(which):
 def fCE(X, Y, w):
     W1, b1, W2, b2 = unpack(w)
 
+    n = X.shape[1]
+    print("n= ", n)
+    print("y shape= ", Y.shape)
     # TODO: CALCULATE LOSS
+    z1 = np.dot(W1,X)
+    z1 = np.vstack((z1.T, b1.T))
+    myList = []
+    for sublist in z1:
+        thisRow = []
+        for element in sublist:
+            thisRow.append(relu(element))
+        myList.append(thisRow)
 
-    return cost, acc, z1, h1, W1, W2, yhat
+    h1 = np.array(myList)
+    z2 = np.dot(W2,h1.T)
+    z2 = np.vstack((z2.T, b2.T))
+    yhat = np.exp(z2) / np.sum(np.exp(z2), axis=None)
+
+    smallSum = np.sum(np.dot(Y.T, np.log(yhat[0:n])), axis=1)
+    bigSum = np.sum(smallSum, axis=0)
+    loss = (-1/n) * bigSum
+    acc = -1
+
+    cost = loss
+    return cost, acc, z1, h1, W1, W2, yhat[0:n]         #deciding whether or not to "clip" off the bias on yhat
 
 
 # Given training images X, associated labels Y, and a vector of combined weights
@@ -86,7 +109,8 @@ def gradCE(X, Y, w):
     W1, b1, W2, b2 = unpack(w)
 
     cost, acc, z1, h1, W1, W2, yhat = fCE(X, Y, w)
-
+    print("Y shape = ",  Y.shape)
+    print("y^hat shape = ", yhat.shape)
     deltaB2 = (yhat - Y)
     deltaW2 = deltaB2 * h1.T
     deltaB1 = np.multiply((deltaB2.T * W2), (reluPrime(z1.T))).T
@@ -216,16 +240,23 @@ if __name__ == "__main__":
     w = pack(W1, b1, W2, b2)
 
     # Check that the gradient is correct on just a few examples (randomly drawn).
+
     idxs = np.random.permutation(trainX.shape[0])[0:NUM_CHECK]
+
+    testMyFCE = fCE(np.atleast_2d(trainX[:, idxs]), np.atleast_2d(trainY[idxs]), w)[0]
+    print(testMyFCE)
+
+    print("(main) Y shape = ", trainY.shape)
+
     print("Numerical gradient:")
-    print(scipy.optimize.approx_fprime(w, lambda w_:
-    fCE(np.atleast_2d(trainX[:, idxs]), np.atleast_2d(trainY[:, idxs]), w_)[0], 1e-10))
+    #print(scipy.optimize.approx_fprime(w, lambda w_:
+    #fCE(np.atleast_2d(trainX[:, idxs]), np.atleast_2d(trainY[idxs]), w_)[1], 1e-10))
     print("Analytical gradient:")
-    print(gradCE(np.atleast_2d(trainX[:, idxs]), np.atleast_2d(trainY[:, idxs]), w))
+    print(gradCE(np.atleast_2d(trainX[:, idxs]), np.atleast_2d(trainY.T[idxs]), w))
     print("Discrepancy:")
     print(
-        scipy.optimize.check_grad(lambda w_: fCE(np.atleast_2d(trainX[:, idxs]), np.atleast_2d(trainY[:, idxs]), w_)[0], \
-                                  lambda w_: gradCE(np.atleast_2d(trainX[:, idxs]), np.atleast_2d(trainY[:, idxs]), w_), \
+        scipy.optimize.check_grad(lambda w_: fCE(np.atleast_2d(trainX[:, idxs]), np.atleast_2d(trainY[idxs]), w_)[0], \
+                                  lambda w_: gradCE(np.atleast_2d(trainX[:, idxs]), np.atleast_2d(trainY[idxs]), w_), \
                                   w))
 
     # Train the network using SGD.
