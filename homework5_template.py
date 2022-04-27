@@ -14,10 +14,10 @@ GLOBAL_DEBUG = False
 cost = 0.0
 acc = 0.0
 
-NUM_HIDDEN_OPTIONS = [30, 50]
-LEARNING_RATE_OPTIONS = [.005, .01]
-MINIBATCH_SIZE_OPTIONS = [32, 64, 128]
-EPOCH_NUM_OPTIONS = [16, 32, 64]
+NUM_HIDDEN_OPTIONS = [40]
+LEARNING_RATE_OPTIONS = [.001, .005, .01]
+MINIBATCH_SIZE_OPTIONS = [ 64, 128, 256]
+EPOCH_NUM_OPTIONS = [32, 64]
 REGULARIZATION_STRENGTH_OPTIONS = [.05, .1]
 
 NUM_HIDDEN = NUM_HIDDEN_OPTIONS[0]  # Number of hidden neurons [HYPERPARAMETER TUNING VALUE]
@@ -78,6 +78,8 @@ def loadData(which):
 # and bias terms w, compute and return the cross-entropy (CE) loss, accuracy,
 # as well as the intermediate values of the NN.
 def fCE(X, Y, w):
+    global cost, acc, NUM_HIDDEN, LEARNING_RATE, MINIBATCH_SIZE, EPOCH_NUM, REGULARIZATION_STRENGTH
+
     W1, b1, W2, b2 = unpack(w)
 
     sample_num, data_len = X.shape
@@ -188,11 +190,9 @@ def train(trainX, trainY, w):
     sample_num, data_len = trainX.shape
     sample_num_y, class_len = trainY.shape
     file_name = 'HW5_plot_bus.csv'
-    os.remove(file_name)
-    # graph code
     # out = []
     # file_name = 'HW5_part1.csv'
-    global cost, acc
+    global cost, acc, NUM_HIDDEN, LEARNING_RATE, MINIBATCH_SIZE, EPOCH_NUM, REGULARIZATION_STRENGTH
     descent_step = 0
 
     for i in range(EPOCH_NUM):
@@ -214,7 +214,6 @@ def train(trainX, trainY, w):
 
             gradient = gradCE(batch, batch_lables, w)
             w = w - LEARNING_RATE * gradient
-            global cost, acc
             cost_output = cost
             acc_output = acc
             df = pd.DataFrame([[descent_step, cost_output, acc_output]])
@@ -222,7 +221,7 @@ def train(trainX, trainY, w):
             descent_step += 1
 
         # cost, acc, yhat = calc_yhat(trainX, trainY, w)
-        print("Epoch: ", i, "Cross-entropy loss: ", cost, "PCC: ", acc)
+        if(GLOBAL_DEBUG): print("Epoch: ", i, "Cross-entropy loss: ", cost, "PCC: ", acc)
     return w
 
 
@@ -287,6 +286,7 @@ def findBestHyperparaneters(trainX, trainY, w):
     MINIBATCH_SIZE = best_MINIBATCH_SIZE
     EPOCH_NUM = best_EPOCH_NUM
     REGULARIZATION_STRENGTH = best_REGULARIZATION_STRENGTH
+    print("The best hyperparameters with loss of ", best_cost, " are: NUM_HIDDEN: ", NUM_HIDDEN," LEARNING_RATE: ", LEARNING_RATE, " MINIBATCH_SIZE: ", MINIBATCH_SIZE, " EPOCH_NUM: ", EPOCH_NUM, " REGULARIZATION_STRENGTH: ", REGULARIZATION_STRENGTH)
 
     return best_w
 
@@ -312,24 +312,26 @@ if __name__ == "__main__":
     code_test_x = np.atleast_2d(trainX[idxs])
     code_test_y = np.atleast_2d(trainY[idxs])
 
-    print("Numerical gradient:")
-    num_grad = scipy.optimize.approx_fprime(w, lambda w_:fCE(code_test_x, np.atleast_2d(trainY[idxs]), w_)[0], 1e-10)
-    print(num_grad.shape)
-    print(num_grad)
-    print("Analytical gradient:")
-    anal_grad = gradCE(code_test_x, code_test_y, w)
-    print(anal_grad.shape)
-    print(anal_grad)
-    print("Discrepancy:")
-    print(
-        scipy.optimize.check_grad(lambda w_: fCE(code_test_x, code_test_y, w_)[0],
-                                  lambda w_: gradCE(code_test_x, code_test_y, w_),
-                                  w))
+    # print("Numerical gradient:")
+    # num_grad = scipy.optimize.approx_fprime(w, lambda w_:fCE(code_test_x, np.atleast_2d(trainY[idxs]), w_)[0], 1e-10)
+    # print(num_grad.shape)
+    # print(num_grad)
+    # print("Analytical gradient:")
+    # anal_grad = gradCE(code_test_x, code_test_y, w)
+    # print(anal_grad.shape)
+    # print(anal_grad)
+    # print("Discrepancy:")
+    # print(
+    #     scipy.optimize.check_grad(lambda w_: fCE(code_test_x, code_test_y, w_)[0],
+    #                               lambda w_: gradCE(code_test_x, code_test_y, w_),
+    #                               w))
 
     # w = train(trainX, trainY, w)
     findBestHyperparaneters(trainX, trainY, w)
     print("Now training using best hyperparameters.")
-    w = train(trainX, trainY, w)
+    print("NUM_HIDDEN: ", NUM_HIDDEN," LEARNING_RATE: ", LEARNING_RATE, " MINIBATCH_SIZE: ", MINIBATCH_SIZE, " EPOCH_NUM: ", EPOCH_NUM, " REGULARIZATION_STRENGTH: ", REGULARIZATION_STRENGTH)
 
-    # Train the network using SGD.
-    # train(trainX, trainY, w)
+    w = train(trainX, trainY, w)
+    cost, acc, z1, h1, W1, W2, yhat = fCE(testX, testY,w)
+    print("Now testing using best hyperparameters.")
+    print("Testing accuracy: ", acc, "Testing CE loss", cost)
