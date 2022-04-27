@@ -80,13 +80,14 @@ def fCE(X, Y, w):
     bias_vector = np.atleast_2d(np.ones(sample_num)).T
     X = np.hstack((X, bias_vector))
 
-    n = X.shape[1]
+    n = X.shape[0]
 
     print("n= ", n)
     print("y shape= ", Y.shape)
     # TODO: CALCULATE LOSS
-    z1 = np.dot(W1, X.T)
-    z1 = np.vstack((z1.T, b1.T))
+    z1 = np.dot(np.hstack((W1, np.atleast_2d(b1).T)), X.T)
+
+    #z1 = np.vstack((z1.T, b1.T))
     myList = []
     for sublist in z1:
         thisRow = []
