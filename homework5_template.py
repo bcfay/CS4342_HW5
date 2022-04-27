@@ -84,16 +84,16 @@ def fCE(X, Y, w):
 
     #print("n= ", n)
     #print("y shape= ", Y.shape)
-    z1 = np.sum(np.dot(np.hstack((W1, np.atleast_2d(np.ones(W1.shape[0])).T)), X.T), axis=1)
+    z1 = np.dot(np.hstack((W1, np.atleast_2d(np.ones(W1.shape[0])).T)), X.T)
     myList = []
-    for element in z1:
+    for element in z1: # can we do this in np?
         myList.append(relu(element))
     h1 = np.array(myList)
     z2 = np.dot(W2, h1)
     # z2 = np.vstack((z2.T, b2.T))
     yhat = np.exp(z2) / np.sum(np.exp(z2), axis=None)
 
-    smallSum = np.sum(np.dot(Y, np.log(yhat[0:n])), axis=1)
+    smallSum = np.dot(Y, np.log(yhat[0:n]))
     bigSum = np.sum(smallSum, axis=0)
     loss = (-1 / n) * bigSum
     acc = -1
@@ -262,24 +262,24 @@ if __name__ == "__main__":
     code_test_x = np.atleast_2d(trainX[idxs])
     code_test_y = np.atleast_2d(trainY[idxs])
 
-    anal_grad = gradCE(code_test_x, code_test_y, w)
-    print(anal_grad)
-
-    testMyFCE = fCE(np.atleast_2d(trainX[idxs]), np.atleast_2d(trainY[idxs]), w)[0]
-    print(testMyFCE)
-
-    print("(main) Y shape = ", trainY.shape)
-
-    print("Numerical gradient:")
-    print(scipy.optimize.approx_fprime(w, lambda w_:
-    fCE(code_test_x, np.atleast_2d(trainY[idxs]), w_)[0], 1e-10))
-    print("Analytical gradient:")
-    print(anal_grad)
-    print("Discrepancy:")
-    print(
-        scipy.optimize.check_grad(lambda w_: fCE(np.atleast_2d(trainX[idxs]), np.atleast_2d(trainY[idxs]), w_)[0], \
-                                  lambda w_: gradCE(np.atleast_2d(trainX[idxs]), np.atleast_2d(trainY[idxs]), w_), \
-                                  w))
+    # anal_grad = gradCE(code_test_x, code_test_y, w)
+    # print(anal_grad)
+    #
+    # testMyFCE = fCE(np.atleast_2d(trainX[idxs]), np.atleast_2d(trainY[idxs]), w)[0]
+    # print(testMyFCE)
+    #
+    # print("(main) Y shape = ", trainY.shape)
+    #
+    # print("Numerical gradient:")
+    # print(scipy.optimize.approx_fprime(w, lambda w_:
+    # fCE(code_test_x, np.atleast_2d(trainY[idxs]), w_)[1], 1e-10))
+    # print("Analytical gradient:")
+    # print(anal_grad)
+    # print("Discrepancy:")
+    # print(
+    #     scipy.optimize.check_grad(lambda w_: fCE(np.atleast_2d(trainX[:, idxs]), np.atleast_2d(trainY[idxs]), w_)[0], \
+    #                               lambda w_: gradCE(np.atleast_2d(trainX[:, idxs]), np.atleast_2d(trainY[idxs]), w_), \
+    #                               w))
 
     # Train the network using SGD.
     train(trainX, trainY, w)
