@@ -56,7 +56,7 @@ def pack(W1, b1, W2, b2):
 def loadData(which):
     images = np.load("fashion_mnist_{}_images.npy".format(which)).T / 255.
     labels = np.load("fashion_mnist_{}_labels.npy".format(which))
-    sample_num, data_len = np.shape(images)
+    data_len, sample_num = np.shape(images)
     lable_len = 10
     labels_OH = np.zeros((sample_num, lable_len))
 
