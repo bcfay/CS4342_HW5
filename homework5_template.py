@@ -22,7 +22,7 @@ REGULARIZATION_STRENGTH_OPTIONS = [.05, .1, .5]
 NUM_HIDDEN = NUM_HIDDEN_OPTIONS[0]  # Number of hidden neurons [HYPERPARAMETER TUNING VALUE]
 LEARNING_RATE = LEARNING_RATE_OPTIONS[0]  # [HYPERPARAMETER TUNING VALUE]
 MINIBATCH_SIZE = MINIBATCH_SIZE_OPTIONS[0]  # [HYPERPARAMETER TUNING VALUE]
-EPOCH_NUM = EPOCH_NUM_OPTIONS[5]  # [HYPERPARAMETER TUNING VALUE]
+EPOCH_NUM = EPOCH_NUM_OPTIONS[0]  # [HYPERPARAMETER TUNING VALUE]
 REGULARIZATION_STRENGTH = REGULARIZATION_STRENGTH_OPTIONS[0]  # [HYPERPARAMETER TUNING VALUE]
 
 
@@ -115,13 +115,15 @@ def fCE(X, Y, w):
                                       0:n]  # deciding whether or not to "clip" off the bias on yhat (see the [0 to n] )
 
 
-# takes 10 x n one-hot vectors for y and yhat
 def fPC(y, yhat):
+    # eq = y==yhat
     n = y.shape[0]
     y_maxes = np.argmax(y, axis=1)
     yhat_maxes = np.argmax(yhat, axis=1)
     pc = np.count_nonzero(y_maxes == yhat_maxes) / n
     return pc
+
+    # return eq
 
 
 # Given training images X, associated labels Y, and a vector of combined weights
@@ -225,8 +227,12 @@ def train(trainX, trainY, w):
             df = pd.DataFrame([[descent_step, cost_output, acc_output]])
             df.to_csv(file_name, mode ='a',header = False,index=False)
             descent_step += 1
-        # cost, acc, yhat = calc_yhat(trainX, trainY, w)
-        print("Epoch: ", i, "Cross-entropy loss: ", cost, "PCC: ", acc)
+            # cost, acc, yhat = calc_yhat(trainX, trainY, w)
+            w = w - LEARNING_RATE * gradient  # make element wise
+        global cost, acc
+        #cost, acc, yhat = calc_yhat(trainX, trainY, w)
+        if (i%50):
+            print("Epoch: ", i, "Cross-entropy loss: ", cost, "PCC: ", acc)
 
         # out.append(f)
         # if (i % 50 == 0):
@@ -246,9 +252,10 @@ def findBestHyperparaneters(trainX, trainY, w):
     EPOCH_NUM_OPTIONS_len = len(EPOCH_NUM_OPTIONS)
     REGULARIZATION_STRENGTH_OPTIONS_len = len(REGULARIZATION_STRENGTH_OPTIONS)
 
-    total_len = (
-            NUM_HIDDEN_OPTIONS_len * LEARNING_RATE_OPTIONS_len * MINIBATCH_SIZE_OPTIONS_len * EPOCH_NUM_OPTIONS_len * REGULARIZATION_STRENGTH_OPTIONS_len)
+    print("---- FINDING OPTIMAL HYPERPARAMETER VALUES.  ----------")
+    total_len = (NUM_HIDDEN_OPTIONS_len * LEARNING_RATE_OPTIONS_len * MINIBATCH_SIZE_OPTIONS_len * EPOCH_NUM_OPTIONS_len * REGULARIZATION_STRENGTH_OPTIONS_len)
     print("Number of total iterations: ", total_len)
+    iterationCounter = 0
     start_time = time.time()
     best_w = w
     best_cost = 1000000000
@@ -276,6 +283,10 @@ def findBestHyperparaneters(trainX, trainY, w):
                         loss = fCE(trainX[validation_idx], trainY[validation_idx], w)[0]
                         if (cost < best_cost):
                             best_cost = cost
+                        print("Iteration ", iterationCounter)
+                        iterationCounter = iterationCounter+1;
+                        if (loss < best_loss):
+                            best_loss = loss
                             best_w = w
                             best_NUM_HIDDEN = NUM_HIDDEN
                             best_LEARNING_RATE = LEARNING_RATE
