@@ -22,7 +22,7 @@ REGULARIZATION_STRENGTH_OPTIONS = [.05, .1, .5]
 NUM_HIDDEN = NUM_HIDDEN_OPTIONS[0]  # Number of hidden neurons [HYPERPARAMETER TUNING VALUE]
 LEARNING_RATE = LEARNING_RATE_OPTIONS[0]  # [HYPERPARAMETER TUNING VALUE]
 MINIBATCH_SIZE = MINIBATCH_SIZE_OPTIONS[0]  # [HYPERPARAMETER TUNING VALUE]
-EPOCH_NUM = EPOCH_NUM_OPTIONS[0]  # [HYPERPARAMETER TUNING VALUE]
+EPOCH_NUM = EPOCH_NUM_OPTIONS[5]  # [HYPERPARAMETER TUNING VALUE]
 REGULARIZATION_STRENGTH = REGULARIZATION_STRENGTH_OPTIONS[0]  # [HYPERPARAMETER TUNING VALUE]
 
 
@@ -115,15 +115,13 @@ def fCE(X, Y, w):
                                       0:n]  # deciding whether or not to "clip" off the bias on yhat (see the [0 to n] )
 
 
+# takes 10 x n one-hot vectors for y and yhat
 def fPC(y, yhat):
-    # eq = y==yhat
     n = y.shape[0]
     y_maxes = np.argmax(y, axis=1)
     yhat_maxes = np.argmax(yhat, axis=1)
     pc = np.count_nonzero(y_maxes == yhat_maxes) / n
     return pc
-
-    # return eq
 
 
 # Given training images X, associated labels Y, and a vector of combined weights
@@ -176,9 +174,9 @@ def calc_yhat(X, Y, w):
 
     a = np.dot(W2, W1)
     b = np.dot(W2, b1)
-    yhat = np.multiply(np.dot(a, X.T), (b + b2))
+    yhat = np.multiply(np.dot(a, X.T).T, (b + b2))
 
-    smallSum = np.dot(Y, np.log(yhat))
+    smallSum = np.dot(Y, np.log(yhat).T)
     bigSum = np.sum(smallSum, axis=0)
     loss = (-1 / n) * bigSum
     acc = -1  # TODO calculate
@@ -197,6 +195,7 @@ def train(trainX, trainY, w):
     # graph code
     # out = []
     # file_name = 'HW5_part1.csv'
+    global cost, acc
 
     for i in range(EPOCH_NUM):
         random_inds = np.arange(sample_num)
@@ -216,9 +215,8 @@ def train(trainX, trainY, w):
                     index_index += 1
 
             gradient = gradCE(batch, batch_lables, w)
-            w = w - LEARNING_RATE * gradient  # make element wise
-        global cost, acc
-        #cost, acc, yhat = calc_yhat(trainX, trainY, w)
+            w = w - LEARNING_RATE * gradient
+        # cost, acc, yhat = calc_yhat(trainX, trainY, w)
         print("Epoch: ", i, "Cross-entropy loss: ", cost, "PCC: ", acc)
 
         # out.append(f)
@@ -328,4 +326,4 @@ if __name__ == "__main__":
     #                               w))
 
     # Train the network using SGD.
-    train(trainX, trainY, w)
+    # train(trainX, trainY, w)
