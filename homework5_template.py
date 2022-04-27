@@ -82,8 +82,8 @@ def fCE(X, Y, w):
 
     n = X.shape[1]
 
-    print("n= ", n)
-    print("y shape= ", Y.shape)
+    #print("n= ", n)
+    #print("y shape= ", Y.shape)
     z1 = np.dot(np.hstack((W1, np.atleast_2d(np.ones(W1.shape[0])).T)), X.T)
     # z1 = np.vstack((z1.T, b1.T))
     myList = []
@@ -104,8 +104,7 @@ def fCE(X, Y, w):
     acc = -1
 
     cost = loss
-    return cost, acc, z1, h1, W1, W2, yhat[
-                                      0:n]  # deciding whether or not to "clip" off the bias on yhat (see the [0 to n] )
+    return cost, acc, z1, h1, W1, W2, yhat[0:n]  # deciding whether or not to "clip" off the bias on yhat (see the [0 to n] )
 
 
 # Given training images X, associated labels Y, and a vector of combined weights
@@ -132,6 +131,8 @@ def gradCE(X, Y, w):
     g = np.multiply(np.dot(diff.T, W2), helper.T).T
     deltaB1 = np.sum(g, axis=1)
     deltaW1 = np.dot(g, X)
+    ##deltaB1 = np.multiply(np.dot(deltaB2.T, W2), helper.T).T
+    #deltaW1 = np.dot(deltaB1, X)
 
     return pack(deltaW1, deltaB1, deltaW2, deltaB2)
 
@@ -276,14 +277,14 @@ if __name__ == "__main__":
 
     print("Numerical gradient:")
     print(scipy.optimize.approx_fprime(w, lambda w_:
-    fCE(code_test_x, np.atleast_2d(trainY[idxs]), w_)[1], 1e-10))
+    fCE(code_test_x, np.atleast_2d(trainY[idxs]), w_)[0], 1e-10))
     print("Analytical gradient:")
     print(anal_grad)
     print("Discrepancy:")
     print(
-        scipy.optimize.check_grad(lambda w_: fCE(np.atleast_2d(trainX[:, idxs]), np.atleast_2d(trainY[idxs]), w_)[0], \
-                                  lambda w_: gradCE(np.atleast_2d(trainX[:, idxs]), np.atleast_2d(trainY[idxs]), w_), \
+        scipy.optimize.check_grad(lambda w_: fCE(np.atleast_2d(trainX[idxs]), np.atleast_2d(trainY[idxs]), w_)[0], \
+                                  lambda w_: gradCE(np.atleast_2d(trainX[idxs]), np.atleast_2d(trainY[idxs]), w_), \
                                   w))
 
     # Train the network using SGD.
-    train(trainX, trainY, testX, testY, w)
+    train(trainX, trainY, w)
