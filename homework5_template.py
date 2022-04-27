@@ -84,8 +84,8 @@ def fCE(X, Y, w):
 
     print("n= ", n)
     print("y shape= ", Y.shape)
-    z1 = np.dot(W1, X.T)
-    z1 = np.vstack((z1.T, b1.T))
+    z1 = np.dot(np.hstack((W1, np.atleast_2d(np.ones(W1.shape[0])).T)), X.T)
+    #z1 = np.vstack((z1.T, b1.T))
     myList = []
     for sublist in z1:
         thisRow = []
@@ -94,11 +94,11 @@ def fCE(X, Y, w):
         myList.append(thisRow)
 
     h1 = np.array(myList)
-    z2 = np.dot(W2, h1.T)
-    z2 = np.vstack((z2.T, b2.T))
+    z2 = np.dot(W2, h1)
+    #z2 = np.vstack((z2.T, b2.T))
     yhat = np.exp(z2) / np.sum(np.exp(z2), axis=None)
 
-    smallSum = np.sum(np.dot(Y, np.log(yhat[0:n].T)), axis=1)
+    smallSum = np.sum(np.dot(Y, np.log(yhat[0:n])), axis=1)
     bigSum = np.sum(smallSum, axis=0)
     loss = (-1 / n) * bigSum
     acc = -1
@@ -117,9 +117,9 @@ def gradCE(X, Y, w):
     cost, acc, z1, h1, W1, W2, yhat = fCE(X, Y, w)
     print("Y shape = ", Y.shape)
     print("y^hat shape = ", yhat.shape)
-    deltaB2 = (yhat - Y)
-    deltaW2 = deltaB2 * (h1).T
-    deltaB1 = np.multiply((deltaB2.T * W2), (reluPrime(z1.T))).T
+    deltaB2 = (yhat - Y.T)
+    deltaW2 = np.dot(deltaB2,h1.T)
+    deltaB1 = np.multiply(np.dot(deltaB2.T,W2), (reluPrime(z1.T))).T
     deltaW1 = deltaB1 * X.T
 
     return pack(deltaW1, deltaB1, deltaW2, deltaB2)
