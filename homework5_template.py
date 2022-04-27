@@ -18,7 +18,7 @@ NUM_HIDDEN_OPTIONS = [40]
 LEARNING_RATE_OPTIONS = [.001, .005, .01]
 MINIBATCH_SIZE_OPTIONS = [ 64, 128, 256]
 EPOCH_NUM_OPTIONS = [32, 64]
-REGULARIZATION_STRENGTH_OPTIONS = [.05, .1]
+REGULARIZATION_STRENGTH_OPTIONS = [.01,.05]
 
 NUM_HIDDEN = NUM_HIDDEN_OPTIONS[0]  # Number of hidden neurons [HYPERPARAMETER TUNING VALUE]
 LEARNING_RATE = LEARNING_RATE_OPTIONS[0]  # [HYPERPARAMETER TUNING VALUE]
@@ -107,9 +107,9 @@ def fCE(X, Y, w):
     acc = fPC(Y, yhat.T)
 
     cost = loss
-    if GLOBAL_DEBUG:
-        print("PC rate: ", acc)
-        print("loss: ", cost)
+    # if GLOBAL_DEBUG:
+    #     print("PC rate: ", acc)
+    #     print("loss: ", cost)
     return cost, acc, z1, h1, W1, W2, yhat  # deciding whether or not to "clip" off the bias on yhat (see the [0 to n] )
 
 
@@ -127,8 +127,8 @@ def fPC(y, yhat):
 # want to extend this function to return multiple arguments (in which case you
 # will also need to modify slightly the gradient check code below).
 def gradCE(X, Y, w):
+    global cost, acc, NUM_HIDDEN, LEARNING_RATE, MINIBATCH_SIZE, EPOCH_NUM, REGULARIZATION_STRENGTH
     W1, b1, W2, b2 = unpack(w)
-
     cost, acc, z1, h1, W1, W2, yhat = fCE(X, Y, w)
     # print("Y shape = ", Y.shape)
     # print("y^hat shape = ", yhat.shape)
@@ -190,8 +190,7 @@ def train(trainX, trainY, w):
     sample_num, data_len = trainX.shape
     sample_num_y, class_len = trainY.shape
     file_name = 'HW5_plot_bus.csv'
-    # out = []
-    # file_name = 'HW5_part1.csv'
+
     global cost, acc, NUM_HIDDEN, LEARNING_RATE, MINIBATCH_SIZE, EPOCH_NUM, REGULARIZATION_STRENGTH
     descent_step = 0
 
@@ -276,7 +275,7 @@ def findBestHyperparaneters(trainX, trainY, w):
                             best_MINIBATCH_SIZE = MINIBATCH_SIZE
                             best_EPOCH_NUM = EPOCH_NUM
                             best_REGULARIZATION_STRENGTH = REGULARIZATION_STRENGTH
-                            print("New best hyperparameters with loss of: ", best_cost, ". NUM_HIDDEN: ", NUM_HIDDEN,
+                            print("New best hyperparameters with validation loss of: ", best_cost, ". NUM_HIDDEN: ", NUM_HIDDEN,
                                   " LEARNING_RATE: ", LEARNING_RATE, " MINIBATCH_SIZE: ", MINIBATCH_SIZE,
                                   " EPOCH_NUM: ", EPOCH_NUM, " REGULARIZATION_STRENGTH: ", REGULARIZATION_STRENGTH)
     print("Globals are now set to best hyperameter values out of available options")
@@ -292,6 +291,7 @@ def findBestHyperparaneters(trainX, trainY, w):
 
 
 if __name__ == "__main__":
+
     # Load data
     if "trainX" not in globals():
         trainX, trainY = loadData("train")
@@ -330,8 +330,8 @@ if __name__ == "__main__":
     findBestHyperparaneters(trainX, trainY, w)
     print("Now training using best hyperparameters.")
     print("NUM_HIDDEN: ", NUM_HIDDEN," LEARNING_RATE: ", LEARNING_RATE, " MINIBATCH_SIZE: ", MINIBATCH_SIZE, " EPOCH_NUM: ", EPOCH_NUM, " REGULARIZATION_STRENGTH: ", REGULARIZATION_STRENGTH)
-
+    print("Now testing using best hyperparameters.")
+    GLOBAL_DEBUG = True
     w = train(trainX, trainY, w)
     cost, acc, z1, h1, W1, W2, yhat = fCE(testX, testY,w)
-    print("Now testing using best hyperparameters.")
     print("Testing accuracy: ", acc, "Testing CE loss", cost)
