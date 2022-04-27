@@ -98,7 +98,7 @@ def fCE(X, Y, w):
     acc = -1
 
     cost = loss
-    return cost, acc, z1, h1, W1, W2, yhat[0:n]         #deciding whether or not to "clip" off the bias on yhat
+    return cost, acc, z1, h1, W1, W2, yhat[0:n]         #deciding whether or not to "clip" off the bias on yhat (see the [0 to n] )
 
 
 # Given training images X, associated labels Y, and a vector of combined weights
@@ -249,8 +249,8 @@ if __name__ == "__main__":
     print("(main) Y shape = ", trainY.shape)
 
     print("Numerical gradient:")
-    #print(scipy.optimize.approx_fprime(w, lambda w_:
-    #fCE(np.atleast_2d(trainX[:, idxs]), np.atleast_2d(trainY[idxs]), w_)[1], 1e-10))
+    print(scipy.optimize.approx_fprime(w, lambda w_:
+    fCE(np.atleast_2d(trainX[:, idxs]), np.atleast_2d(trainY[idxs]), w_)[1], 1e-10))
     print("Analytical gradient:")
     print(gradCE(np.atleast_2d(trainX[:, idxs]), np.atleast_2d(trainY.T[idxs]), w))
     print("Discrepancy:")
