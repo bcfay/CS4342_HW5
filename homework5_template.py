@@ -8,6 +8,11 @@ NUM_INPUT = 784  # Number of input neurons
 NUM_OUTPUT = 10  # Number of output neurons
 NUM_CHECK = 5  # Number of examples on which to check the gradient
 
+GLOBAL_DEBUG = True
+
+cost = 0.0
+acc = 0.0
+
 NUM_HIDDEN_OPTIONS = [30, 40, 50]
 LEARNING_RATE_OPTIONS = [.001, .005, .01, .05, .1, .5]
 MINIBATCH_SIZE_OPTIONS = [16, 32, 64, 128, 256]
@@ -68,7 +73,6 @@ def loadData(which):
     return images, labels_OH
 
 
-
 # Given training images X, associated labels Y, and a vector of combined weights
 # and bias terms w, compute and return the cross-entropy (CE) loss, accuracy,
 # as well as the intermediate values of the NN.
@@ -97,12 +101,16 @@ def fCE(X, Y, w):
     # z2 = np.vstack((z2.T, b2.T))
     yhat = np.exp(z2) / np.sum(np.exp(z2), axis=0)
 
-    smallSum = np.dot(Y, np.log(yhat))
+    smallSum = np.sum(np.dot(Y, np.log(yhat)), axis=0)
     bigSum = np.sum(smallSum, axis=0)
     loss = (-1 / n) * bigSum
+    global acc, cost
     acc = fPC(Y, yhat.T)
 
     cost = loss
+    if GLOBAL_DEBUG:
+        print("PC rate: ", acc)
+        print("loss: ", cost)
     return cost, acc, z1, h1, W1, W2, yhat[
                                       0:n]  # deciding whether or not to "clip" off the bias on yhat (see the [0 to n] )
 
@@ -209,9 +217,10 @@ def train(trainX, trainY, w):
 
             gradient = gradCE(batch, batch_lables, w)
             w = w - LEARNING_RATE * gradient  # make element wise
-
-        cost, acc, yhat = calc_yhat(trainX, trainY, w)
+        global cost, acc
+        #cost, acc, yhat = calc_yhat(trainX, trainY, w)
         print("Epoch: ", i, "Cross-entropy loss: ", cost, "PCC: ", acc)
+
         # out.append(f)
         # if (i % 50 == 0):
         # df = pd.DataFrame(out, columns=["fMSE"])
