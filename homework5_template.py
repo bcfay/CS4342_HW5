@@ -87,16 +87,9 @@ def fCE(X, Y, w):
     X = np.hstack((X, bias_vector))
 
     n = X.shape[0]
-
-    # print("n= ", n)
-    # print("y shape= ", Y.shape)
-    z1 = np.dot(np.hstack((W1, np.atleast_2d(np.ones(W1.shape[0])).T)), X.T)
-    myList = []
     relu_vec = np.vectorize(relu)
 
-    # for element in z1:  # can we do this in np?
-    #     myList.append(relu(element))
-
+    z1 = np.dot(np.hstack((W1, np.atleast_2d(np.ones(W1.shape[0])).T)), X.T)
     h1 = relu_vec(z1)
     z2 = np.dot(W2, h1)
     # z2 = np.vstack((z2.T, b2.T))
@@ -105,15 +98,15 @@ def fCE(X, Y, w):
     smallSum = np.sum(np.dot(Y, np.log(yhat)), axis=0)
     bigSum = np.sum(smallSum, axis=0)
     loss = (-1 / n) * bigSum
+
     global acc, cost
     acc = fPC(Y, yhat.T)
-
     cost = loss
+
     if GLOBAL_DEBUG:
         print("PC rate: ", acc)
         print("loss: ", cost)
-    return cost, acc, z1, h1, W1, W2, yhat[
-                                      0:n]  # deciding whether or not to "clip" off the bias on yhat (see the [0 to n] )
+    return cost, acc, z1, h1, W1, W2, yhat  # deciding whether or not to "clip" off the bias on yhat (see the [0 to n] )
 
 
 # takes 10 x n one-hot vectors for y and yhat
