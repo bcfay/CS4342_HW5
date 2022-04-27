@@ -82,16 +82,20 @@ def fCE(X, Y, w):
 
     n = X.shape[1]
 
-    #print("n= ", n)
-    #print("y shape= ", Y.shape)
+    # print("n= ", n)
+    # print("y shape= ", Y.shape)
     z1 = np.dot(np.hstack((W1, np.atleast_2d(np.ones(W1.shape[0])).T)), X.T)
     myList = []
-    for element in z1: # can we do this in np?
-        myList.append(relu(element))
-    h1 = np.array(myList)
+    relu_vec = np.vectorize(relu)
+
+    # for element in z1:  # can we do this in np?
+    #     myList.append(relu(element))
+    print(relu_vec(z1))
+
+    h1 = relu_vec(z1)
     z2 = np.dot(W2, h1)
     # z2 = np.vstack((z2.T, b2.T))
-    yhat = np.exp(z2) / np.sum(np.exp(z2), axis=None)
+    yhat = np.exp(z2) / np.exp(z2)
 
     smallSum = np.dot(Y, np.log(yhat[0:n]))
     bigSum = np.sum(smallSum, axis=0)
@@ -99,7 +103,8 @@ def fCE(X, Y, w):
     acc = -1
 
     cost = loss
-    return cost, acc, z1, h1, W1, W2, yhat[0:n]  # deciding whether or not to "clip" off the bias on yhat (see the [0 to n] )
+    return cost, acc, z1, h1, W1, W2, yhat[
+                                      0:n]  # deciding whether or not to "clip" off the bias on yhat (see the [0 to n] )
 
 
 # Given training images X, associated labels Y, and a vector of combined weights
@@ -127,13 +132,16 @@ def gradCE(X, Y, w):
     deltaB1 = np.sum(g, axis=1)
     deltaW1 = np.dot(g, X)
     ##deltaB1 = np.multiply(np.dot(deltaB2.T, W2), helper.T).T
-    #deltaW1 = np.dot(deltaB1, X)
+    # deltaW1 = np.dot(deltaB1, X)
 
     return pack(deltaW1, deltaB1, deltaW2, deltaB2)
 
 
-def relu(z):
-    return max(0.0, z)
+relu = lambda z:max(0.0, z)
+
+
+# def relu(z):
+#     return max(0.0, z)
 
 
 def reluPrime(z):
