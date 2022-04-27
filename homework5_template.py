@@ -22,7 +22,7 @@ REGULARIZATION_STRENGTH_OPTIONS = [.05, .1, .5]
 NUM_HIDDEN = NUM_HIDDEN_OPTIONS[0]  # Number of hidden neurons [HYPERPARAMETER TUNING VALUE]
 LEARNING_RATE = LEARNING_RATE_OPTIONS[0]  # [HYPERPARAMETER TUNING VALUE]
 MINIBATCH_SIZE = MINIBATCH_SIZE_OPTIONS[0]  # [HYPERPARAMETER TUNING VALUE]
-EPOCH_NUM = EPOCH_NUM_OPTIONS[2]  # [HYPERPARAMETER TUNING VALUE]
+EPOCH_NUM = EPOCH_NUM_OPTIONS[0]  # [HYPERPARAMETER TUNING VALUE]
 REGULARIZATION_STRENGTH = REGULARIZATION_STRENGTH_OPTIONS[0]  # [HYPERPARAMETER TUNING VALUE]
 
 
@@ -253,7 +253,9 @@ def findBestHyperparaneters(trainX, trainY, w):
     best_REGULARIZATION_STRENGTH = 0
 
     # TODO get validation data to test with
-
+    validation_len =int(0.2 * data_len)
+    #idxs = np.random.permutation((trainX.T).shape[0])[0:NUM_CHECK]
+    validation_idx = np.random.permutation(trainX.T.shape[0])[0:validation_len]
     for a in range(NUM_HIDDEN_OPTIONS_len):
         NUM_HIDDEN = NUM_HIDDEN_OPTIONS[a]
         for b in range(LEARNING_RATE_OPTIONS_len):
@@ -264,8 +266,8 @@ def findBestHyperparaneters(trainX, trainY, w):
                     EPOCH_NUM = EPOCH_NUM_OPTIONS[d]
                     for e in range(REGULARIZATION_STRENGTH_OPTIONS_len):
                         REGULARIZATION_STRENGTH = REGULARIZATION_STRENGTH_OPTIONS[e]
-                        w = train(trainX, trainY, w)
-                        loss = fCE(trainX, trainY, w)[0]
+                        w = train(trainX[validation_idx], trainY[validation_idx], w)
+                        loss = fCE(trainX[validation_idx], trainY[validation_idx], w)[0]
                         if (loss < best_loss):
                             best_loss = loss
                             best_w = w
