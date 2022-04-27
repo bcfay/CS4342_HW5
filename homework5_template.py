@@ -119,8 +119,16 @@ def gradCE(X, Y, w):
     print("y^hat shape = ", yhat.shape)
     deltaB2 = (yhat - Y.T)
     deltaW2 = np.dot(deltaB2,h1.T)
-    deltaB1 = np.multiply(np.dot(deltaB2.T,W2), (reluPrime(z1.T))).T
-    deltaW1 = deltaB1 * X.T
+    myList = []
+    for sublist in z1:
+        thisRow = []
+        for element in sublist:
+            thisRow.append(reluPrime(element))
+        myList.append(thisRow)
+
+    helper = np.array(myList)
+    deltaB1 = np.multiply(np.dot(deltaB2.T,W2), helper.T).T
+    deltaW1 = np.dot(deltaB1,X)
 
     return pack(deltaW1, deltaB1, deltaW2, deltaB2)
 
