@@ -74,7 +74,14 @@ def loadData(which):
 def fCE(X, Y, w):
     W1, b1, W2, b2 = unpack(w)
 
+    sample_num, data_len = X.shape
+    sample_num_y, class_len = Y.shape
+
+    bias_vector = np.atleast_2d(np.ones(sample_num)).T
+    X = np.hstack((X, bias_vector))
+
     n = X.shape[1]
+
     print("n= ", n)
     print("y shape= ", Y.shape)
     # TODO: CALCULATE LOSS
@@ -108,12 +115,11 @@ def fCE(X, Y, w):
 def gradCE(X, Y, w):
     W1, b1, W2, b2 = unpack(w)
 
-    # cost, acc, z1, h1, W1, W2, yhat = fCE(X, Y, w)
-    cost, acc, z1, h1, W1, W2, yhat = (1, 1, np.ones(NUM_HIDDEN), np.ones(NUM_HIDDEN), np.empty_like(W1), np.empty_like(W2), np.empty_like(Y))
+    cost, acc, z1, h1, W1, W2, yhat = fCE(X, Y, w)
     print("Y shape = ", Y.shape)
     print("y^hat shape = ", yhat.shape)
     deltaB2 = (yhat - Y)
-    deltaW2 = deltaB2 * h1.T
+    deltaW2 = deltaB2 * (h1).T
     deltaB1 = np.multiply((deltaB2.T * W2), (reluPrime(z1.T))).T
     deltaW1 = deltaB1 * X.T
 
@@ -134,8 +140,8 @@ def reluPrime(z):
 # Given training and testing datasets and an initial set of weights/biases b,
 # train the NN.
 def train(trainX, trainY, w):
-    data_len, sample_num = trainX.shape
-    data_len_y, class_len = trainY.shape
+    sample_num, data_len = trainX.shape #TODO fix this, old
+    sample_num_y, class_len = trainY.shape
 
     # graph code
     # out = []
@@ -250,8 +256,8 @@ if __name__ == "__main__":
     code_test_x = np.atleast_2d(trainX[idxs])
     code_test_y = np.atleast_2d(trainY[idxs])
 
-    # anal_grad = gradCE(code_test_x, code_test_y, w)
-    # print(anal_grad)
+    anal_grad = gradCE(code_test_x, code_test_y, w)
+    print(anal_grad)
 
     testMyFCE = fCE(np.atleast_2d(trainX[idxs]), np.atleast_2d(trainY[idxs]), w)[0]
     print(testMyFCE)
@@ -262,7 +268,6 @@ if __name__ == "__main__":
     print(scipy.optimize.approx_fprime(w, lambda w_:
     fCE(code_test_x, np.atleast_2d(trainY[idxs]), w_)[1], 1e-10))
     print("Analytical gradient:")
-    anal_grad = gradCE(code_test_x, code_test_y, w)
     print(anal_grad)
     print("Discrepancy:")
     print(
