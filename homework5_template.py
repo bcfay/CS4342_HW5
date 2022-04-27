@@ -167,7 +167,7 @@ def train(trainX, trainY, w):
             w = w - LEARNING_RATE * gradient  # make element wise
 
         cost, acc, z1, h1, W1, W2, yhat = fCE(trainX, trainY, w)
-        print("Cross-entropy loss: ", cost, "PCC: ", acc)
+        print("Epoch: ", i, "Cross-entropy loss: ", cost, "PCC: ", acc)
         # out.append(f)
         # if (i % 50 == 0):
         # df = pd.DataFrame(out, columns=["fMSE"])
