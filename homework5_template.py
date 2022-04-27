@@ -1,6 +1,7 @@
 import time
 import pandas as pd
 import numpy as np
+import os
 import matplotlib.pyplot as plt
 import scipy.optimize
 
@@ -132,8 +133,8 @@ def gradCE(X, Y, w):
     W1, b1, W2, b2 = unpack(w)
 
     cost, acc, z1, h1, W1, W2, yhat = fCE(X, Y, w)
-    # print("Y shape = ", Y.shape)
-    # print("y^hat shape = ", yhat.shape)
+    print("Y shape = ", Y.shape)
+    print("y^hat shape = ", yhat.shape)
     diff = (yhat - Y.T)
     deltaB2 = np.sum(diff, axis=1)
     deltaW2 = np.dot(diff, h1.T)
@@ -191,7 +192,8 @@ def calc_yhat(X, Y, w):
 def train(trainX, trainY, w):
     sample_num, data_len = trainX.shape
     sample_num_y, class_len = trainY.shape
-
+    file_name = 'HW5_plot_bus.csv'
+    os.remove(file_name)
     # graph code
     # out = []
     # file_name = 'HW5_part1.csv'
@@ -218,21 +220,14 @@ def train(trainX, trainY, w):
             gradient = gradCE(batch, batch_lables, w)
             w = w - LEARNING_RATE * gradient
             global cost, acc
-
-            file_name = 'HW5_plot_bus.csv'
             cost_output = cost
             acc_output = acc
             df = pd.DataFrame([[descent_step, cost_output, acc_output]])
-            df.to_csv(file_name, mode ='a',header = False,index=False)
+            df.to_csv(file_name, mode='a', header=False, index=False)
             descent_step += 1
+
         # cost, acc, yhat = calc_yhat(trainX, trainY, w)
         print("Epoch: ", i, "Cross-entropy loss: ", cost, "PCC: ", acc)
-
-        # out.append(f)
-        # if (i % 50 == 0):
-        # df = pd.DataFrame(out, columns=["fMSE"])
-        # df.to_csv(file_name)
-
     return w
 
 
@@ -259,8 +254,8 @@ def findBestHyperparaneters(trainX, trainY, w):
     best_REGULARIZATION_STRENGTH = 0
 
     # TODO get validation data to test with
-    validation_len =int(0.2 * data_len)
-    #idxs = np.random.permutation((trainX.T).shape[0])[0:NUM_CHECK]
+    validation_len = int(0.2 * data_len)
+    # idxs = np.random.permutation((trainX.T).shape[0])[0:NUM_CHECK]
     validation_idx = np.random.permutation(trainX.T.shape[0])[0:validation_len]
     for a in range(NUM_HIDDEN_OPTIONS_len):
         NUM_HIDDEN = NUM_HIDDEN_OPTIONS[a]
@@ -273,7 +268,6 @@ def findBestHyperparaneters(trainX, trainY, w):
                     for e in range(REGULARIZATION_STRENGTH_OPTIONS_len):
                         REGULARIZATION_STRENGTH = REGULARIZATION_STRENGTH_OPTIONS[e]
                         w = train(trainX[validation_idx], trainY[validation_idx], w)
-                        loss = fCE(trainX[validation_idx], trainY[validation_idx], w)[0]
                         if (cost < best_cost):
                             best_cost = cost
                             best_w = w
@@ -317,25 +311,22 @@ if __name__ == "__main__":
     code_test_x = np.atleast_2d(trainX[idxs])
     code_test_y = np.atleast_2d(trainY[idxs])
 
-    # anal_grad = gradCE(code_test_x, code_test_y, w)
-    # print(anal_grad)
-    #
-    # testMyFCE = fCE(np.atleast_2d(trainX[idxs]), np.atleast_2d(trainY[idxs]), w)[0]
-    # print(testMyFCE)
-    #
-    # print("(main) Y shape = ", trainY.shape)
-    #
-    # print("Numerical gradient:")
-    # print(scipy.optimize.approx_fprime(w, lambda w_:
-    # fCE(code_test_x, np.atleast_2d(trainY[idxs]), w_)[1], 1e-10))
-    # print("Analytical gradient:")
-    # print(anal_grad)
-    # print("Discrepancy:")
-    # print(
-    #     scipy.optimize.check_grad(lambda w_: fCE(np.atleast_2d(trainX[:, idxs]), np.atleast_2d(trainY[idxs]), w_)[0], \
-    #                               lambda w_: gradCE(np.atleast_2d(trainX[:, idxs]), np.atleast_2d(trainY[idxs]), w_), \
-    #                               w))
+    print("Numerical gradient:")
+    num_grad = scipy.optimize.approx_fprime(w, lambda w_:fCE(code_test_x, np.atleast_2d(trainY[idxs]), w_)[1], 1e-10)
+    print(num_grad)
+    print("Analytical gradient:")
+    anal_grad = gradCE(code_test_x, code_test_y, w)
+    print(anal_grad)
+    print("Discrepancy:")
+    print(
+        scipy.optimize.check_grad(lambda w_: fCE(np.atleast_2d(trainX[:, idxs]), np.atleast_2d(trainY[idxs]), w_)[0],
+                                  lambda w_: gradCE(np.atleast_2d(trainX[:, idxs]), np.atleast_2d(trainY[idxs]), w_),
+                                  w))
+
     w = train(trainX, trainY, w)
     findBestHyperparaneters(trainX, trainY, w)
+    print("Now training using best hyperparameters.")
+    w = train(trainX, trainY, w)
+
     # Train the network using SGD.
     # train(trainX, trainY, w)
