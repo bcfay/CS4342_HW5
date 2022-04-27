@@ -17,7 +17,7 @@ acc = 0.0
 NUM_HIDDEN_OPTIONS = [30, 40, 50]
 LEARNING_RATE_OPTIONS = [.001, .005, .01, .05, .1, .5]
 MINIBATCH_SIZE_OPTIONS = [16, 32, 64, 128, 256]
-EPOCH_NUM_OPTIONS = [1, 2, 4, 8, 16, 32, 64, 128]
+EPOCH_NUM_OPTIONS = [1, 2, 4, 8, 16, 32, 64]
 REGULARIZATION_STRENGTH_OPTIONS = [.05, .1, .5]
 
 NUM_HIDDEN = NUM_HIDDEN_OPTIONS[0]  # Number of hidden neurons [HYPERPARAMETER TUNING VALUE]
@@ -95,7 +95,8 @@ def fCE(X, Y, w):
     # z2 = np.vstack((z2.T, b2.T))
     yhat = np.exp(z2) / np.sum(np.exp(z2), axis=0)
 
-    smallSum = np.sum(np.dot(Y, np.log(yhat)), axis=0)
+    bug = np.multiply(Y.T, np.log(yhat))
+    smallSum = np.sum(bug, axis=0)
     bigSum = np.sum(smallSum, axis=0)
     loss = (-1 / n) * bigSum
 
@@ -246,7 +247,7 @@ def findBestHyperparaneters(trainX, trainY, w):
     best_MINIBATCH_SIZE = 0
     best_EPOCH_NUM = 0
     best_REGULARIZATION_STRENGTH = 0
-
+    global cost,acc
     # TODO get validation data to test with
     validation_len = int(0.2 * data_len)
     # idxs = np.random.permutation((trainX.T).shape[0])[0:NUM_CHECK]
@@ -262,13 +263,12 @@ def findBestHyperparaneters(trainX, trainY, w):
                     for e in range(REGULARIZATION_STRENGTH_OPTIONS_len):
                         REGULARIZATION_STRENGTH = REGULARIZATION_STRENGTH_OPTIONS[e]
                         w = train(trainX[validation_idx], trainY[validation_idx], w)
-                        loss = fCE(trainX[validation_idx], trainY[validation_idx], w)[0]
-                        if (cost < best_cost):
-                            best_cost = cost
+                        validation_loss = fCE(trainX[validation_idx], trainY[validation_idx], w)[0]
+
                         print("Iteration ", iterationCounter)
                         iterationCounter = iterationCounter+1;
-                        if (loss < best_loss):
-                            best_loss = loss
+                        if (validation_loss < best_cost):
+                            best_cost = validation_loss
                             best_w = w
                             best_NUM_HIDDEN = NUM_HIDDEN
                             best_LEARNING_RATE = LEARNING_RATE
@@ -324,7 +324,7 @@ if __name__ == "__main__":
                                   lambda w_: gradCE(code_test_x, code_test_y, w_),
                                   w))
 
-    w = train(trainX, trainY, w)
+    # w = train(trainX, trainY, w)
     findBestHyperparaneters(trainX, trainY, w)
     print("Now training using best hyperparameters.")
     w = train(trainX, trainY, w)
