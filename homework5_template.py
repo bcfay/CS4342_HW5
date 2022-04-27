@@ -78,7 +78,7 @@ def fCE(X, Y, w):
     print("n= ", n)
     print("y shape= ", Y.shape)
     # TODO: CALCULATE LOSS
-    z1 = np.dot(W1, X)
+    z1 = np.dot(W1, X.T)
     z1 = np.vstack((z1.T, b1.T))
     myList = []
     for sublist in z1:
@@ -92,7 +92,7 @@ def fCE(X, Y, w):
     z2 = np.vstack((z2.T, b2.T))
     yhat = np.exp(z2) / np.sum(np.exp(z2), axis=None)
 
-    smallSum = np.sum(np.dot(Y.T, np.log(yhat[0:n])), axis=1)
+    smallSum = np.sum(np.dot(Y, np.log(yhat[0:n].T)), axis=1)
     bigSum = np.sum(smallSum, axis=0)
     loss = (-1 / n) * bigSum
     acc = -1
@@ -249,11 +249,12 @@ if __name__ == "__main__":
 
     code_test_x = np.atleast_2d(trainX[idxs])
     code_test_y = np.atleast_2d(trainY[idxs])
-    anal_grad = gradCE(code_test_x, code_test_y, w)
-    print(anal_grad)
 
-    # testMyFCE = fCE(np.atleast_2d(trainX[idxs]), np.atleast_2d(trainY[idxs]), w)[0]
-    # print(testMyFCE)
+    # anal_grad = gradCE(code_test_x, code_test_y, w)
+    # print(anal_grad)
+
+    testMyFCE = fCE(np.atleast_2d(trainX[idxs]), np.atleast_2d(trainY[idxs]), w)[0]
+    print(testMyFCE)
 
     print("(main) Y shape = ", trainY.shape)
 
@@ -261,6 +262,7 @@ if __name__ == "__main__":
     print(scipy.optimize.approx_fprime(w, lambda w_:
     fCE(code_test_x, np.atleast_2d(trainY[idxs]), w_)[1], 1e-10))
     print("Analytical gradient:")
+    anal_grad = gradCE(code_test_x, code_test_y, w)
     print(anal_grad)
     print("Discrepancy:")
     print(
