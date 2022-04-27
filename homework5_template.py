@@ -8,7 +8,7 @@ NUM_INPUT = 784  # Number of input neurons
 NUM_OUTPUT = 10  # Number of output neurons
 NUM_CHECK = 5  # Number of examples on which to check the gradient
 
-GLOBAL_DEBUG = True
+GLOBAL_DEBUG = False
 
 cost = 0.0
 acc = 0.0
@@ -22,7 +22,7 @@ REGULARIZATION_STRENGTH_OPTIONS = [.05, .1, .5]
 NUM_HIDDEN = NUM_HIDDEN_OPTIONS[0]  # Number of hidden neurons [HYPERPARAMETER TUNING VALUE]
 LEARNING_RATE = LEARNING_RATE_OPTIONS[0]  # [HYPERPARAMETER TUNING VALUE]
 MINIBATCH_SIZE = MINIBATCH_SIZE_OPTIONS[0]  # [HYPERPARAMETER TUNING VALUE]
-EPOCH_NUM = EPOCH_NUM_OPTIONS[0]  # [HYPERPARAMETER TUNING VALUE]
+EPOCH_NUM = EPOCH_NUM_OPTIONS[2]  # [HYPERPARAMETER TUNING VALUE]
 REGULARIZATION_STRENGTH = REGULARIZATION_STRENGTH_OPTIONS[0]  # [HYPERPARAMETER TUNING VALUE]
 
 
@@ -85,7 +85,7 @@ def fCE(X, Y, w):
     bias_vector = np.atleast_2d(np.ones(sample_num)).T
     X = np.hstack((X, bias_vector))
 
-    n = X.shape[1]
+    n = X.shape[0]
 
     # print("n= ", n)
     # print("y shape= ", Y.shape)
