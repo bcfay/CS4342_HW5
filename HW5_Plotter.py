@@ -19,11 +19,10 @@ def animate(i):
             data = line.split(',')
             xs.append(float(data[0]))
             y1s.append(float(data[1]))
-            y2s.append(float(data[3]))
-            # y3s.append(float(data[4]))
+            y2s.append(float(data[2]))
     ax1.clear()
     ax1.plot(xs, y1s, "-b", label="Loss")
-    ax1.plot(xs, y2s, "-r", label="Cost")
+    ax1.plot(xs, y2s, "-r", label="PCC")
     # ax1.plot(xs, [x/max(y3s) for x in y3s], "-y", label="Relative training time") #scale over max training time
     ax1.legend(loc="upper left")
     # plt.ylim(0, 1.5)

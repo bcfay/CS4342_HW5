@@ -222,10 +222,9 @@ def train(trainX, trainY, w):
             file_name = 'HW5_plot_bus.csv'
             cost_output = cost
             acc_output = acc
-            df = pd.DataFrame([descent_step, cost_output, acc_output])
-            df.to_csv(file_name, mode ='a',header = False)
+            df = pd.DataFrame([[descent_step, cost_output, acc_output]])
+            df.to_csv(file_name, mode ='a',header = False,index=False)
             descent_step += 1
-        global cost, acc
         # cost, acc, yhat = calc_yhat(trainX, trainY, w)
         print("Epoch: ", i, "Cross-entropy loss: ", cost, "PCC: ", acc)
 
