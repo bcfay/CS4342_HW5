@@ -98,12 +98,13 @@ def fCE(X, Y, w):
     bug = np.multiply(Y.T, np.log(yhat))
     smallSum = np.sum(bug, axis=0)
     bigSum = np.sum(smallSum, axis=0)
-    loss = (-1 / n) * bigSum
-
+    #alpha = 0.1
+    alpha = REGULARIZATION_STRENGTH
+    loss = (-1 / n) * bigSum  + ((alpha/(2*n))*np.dot(w.T,w))
     global acc, cost
     acc = fPC(Y, yhat.T)
-    cost = loss
 
+    cost = loss
     if GLOBAL_DEBUG:
         print("PC rate: ", acc)
         print("loss: ", cost)
@@ -214,6 +215,8 @@ def train(trainX, trainY, w):
             gradient = gradCE(batch, batch_lables, w)
             w = w - LEARNING_RATE * gradient
             global cost, acc
+
+            file_name = 'HW5_plot_bus.csv'
             cost_output = cost
             acc_output = acc
             df = pd.DataFrame([[descent_step, cost_output, acc_output]])
@@ -311,7 +314,7 @@ if __name__ == "__main__":
     code_test_y = np.atleast_2d(trainY[idxs])
 
     print("Numerical gradient:")
-    num_grad = scipy.optimize.approx_fprime(w, lambda w_:fCE(code_test_x, np.atleast_2d(trainY[idxs]), w_)[1], 1e-10)
+    num_grad = scipy.optimize.approx_fprime(w, lambda w_:fCE(code_test_x, np.atleast_2d(trainY[idxs]), w_)[0], 1e-10)
     print(num_grad.shape)
     print(num_grad)
     print("Analytical gradient:")
