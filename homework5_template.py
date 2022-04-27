@@ -56,7 +56,7 @@ def pack(W1, b1, W2, b2):
 def loadData(which):
     images = np.load("fashion_mnist_{}_images.npy".format(which)) / 255.
     labels = np.load("fashion_mnist_{}_labels.npy".format(which))
-    data_len, sample_num = np.shape(images)
+    sample_num, data_len = np.shape(images)
     lable_len = 10
     labels_OH = np.zeros((sample_num, lable_len))
 
@@ -244,10 +244,11 @@ if __name__ == "__main__":
 
     # Check that the gradient is correct on just a few examples (randomly drawn).
     idxs = np.random.permutation((trainX.T).shape[0])[0:NUM_CHECK]
-    print(trainX[idxs])
+    anal_grad = gradCE(np.atleast_2d(trainX[idxs]), np.atleast_2d(trainY.T[idxs]), w)
+    print(anal_grad)
 
-    testMyFCE = fCE(np.atleast_2d(trainX[idxs]), np.atleast_2d(trainY[idxs]), w)[0]
-    print(testMyFCE)
+    # testMyFCE = fCE(np.atleast_2d(trainX[idxs]), np.atleast_2d(trainY[idxs]), w)[0]
+    # print(testMyFCE)
 
     print("(main) Y shape = ", trainY.shape)
 
@@ -255,7 +256,7 @@ if __name__ == "__main__":
     print(scipy.optimize.approx_fprime(w, lambda w_:
     fCE(np.atleast_2d(trainX[idxs]), np.atleast_2d(trainY[idxs]), w_)[1], 1e-10))
     print("Analytical gradient:")
-    print(gradCE(np.atleast_2d(trainX[idxs]), np.atleast_2d(trainY.T[idxs]), w))
+    print(anal_grad)
     print("Discrepancy:")
     print(
         scipy.optimize.check_grad(lambda w_: fCE(np.atleast_2d(trainX[:, idxs]), np.atleast_2d(trainY[idxs]), w_)[0], \
