@@ -90,14 +90,13 @@ def fCE(X, Y, w):
 
     # for element in z1:  # can we do this in np?
     #     myList.append(relu(element))
-    print(relu_vec(z1))
 
     h1 = relu_vec(z1)
     z2 = np.dot(W2, h1)
     # z2 = np.vstack((z2.T, b2.T))
     yhat = np.exp(z2) / np.exp(z2)
 
-    smallSum = np.dot(Y, np.log(yhat[0:n]))
+    smallSum = np.dot(Y, np.log(yhat))
     bigSum = np.sum(smallSum, axis=0)
     loss = (-1 / n) * bigSum
     acc = -1
@@ -178,7 +177,7 @@ def train(trainX, trainY, w):
                     batch_lables[k] = trainY[ind]
                     index_index += 1
 
-            gradient = gradCE(trainX, trainY, w)
+            gradient = gradCE(batch, batch_lables, w)
             w = w - LEARNING_RATE * gradient  # make element wise
 
         cost, acc, z1, h1, W1, W2, yhat = fCE(trainX, trainY, w)
