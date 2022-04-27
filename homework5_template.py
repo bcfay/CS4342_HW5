@@ -11,7 +11,7 @@ NUM_CHECK = 5  # Number of examples on which to check the gradient
 NUM_HIDDEN_OPTIONS = [30, 40, 50]
 LEARNING_RATE_OPTIONS = [.001, .005, .01, .05, .1, .5]
 MINIBATCH_SIZE_OPTIONS = [16, 32, 64, 128, 256]
-EPOCH_NUM_OPTIONS = [1, 2, 4, 8]
+EPOCH_NUM_OPTIONS = [1, 2, 4, 8, 16, 32, 64, 128]
 REGULARIZATION_STRENGTH_OPTIONS = [.05, .1, .5]
 
 NUM_HIDDEN = NUM_HIDDEN_OPTIONS[0]  # Number of hidden neurons [HYPERPARAMETER TUNING VALUE]
@@ -84,7 +84,6 @@ def fCE(X, Y, w):
 
     print("n= ", n)
     print("y shape= ", Y.shape)
-    # TODO: CALCULATE LOSS
     z1 = np.dot(W1, X.T)
     z1 = np.vstack((z1.T, b1.T))
     myList = []
@@ -140,7 +139,7 @@ def reluPrime(z):
 # Given training and testing datasets and an initial set of weights/biases b,
 # train the NN.
 def train(trainX, trainY, w):
-    sample_num, data_len = trainX.shape #TODO fix this, old
+    sample_num, data_len = trainX.shape
     sample_num_y, class_len = trainY.shape
 
     # graph code
@@ -167,12 +166,12 @@ def train(trainX, trainY, w):
             gradient = gradCE(trainX, trainY, w)
             w = w - LEARNING_RATE * gradient  # make element wise
 
-            # cost, acc, z1, h1, W1, W2, yhat = fCE(X, Y, w)
-            # print("Cross-entropy loss:", acc)
-            # out.append(f)
-            # if (i % 50 == 0):
-            # df = pd.DataFrame(out, columns=["fMSE"])
-            # df.to_csv(file_name)
+        cost, acc, z1, h1, W1, W2, yhat = fCE(trainX, trainY, w)
+        print("Cross-entropy loss: ", cost, "PCC: ", acc)
+        # out.append(f)
+        # if (i % 50 == 0):
+        # df = pd.DataFrame(out, columns=["fMSE"])
+        # df.to_csv(file_name)
 
     return w
 
