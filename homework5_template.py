@@ -1,5 +1,5 @@
 import time
-
+import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
 import scipy.optimize
@@ -22,7 +22,7 @@ REGULARIZATION_STRENGTH_OPTIONS = [.05, .1, .5]
 NUM_HIDDEN = NUM_HIDDEN_OPTIONS[0]  # Number of hidden neurons [HYPERPARAMETER TUNING VALUE]
 LEARNING_RATE = LEARNING_RATE_OPTIONS[0]  # [HYPERPARAMETER TUNING VALUE]
 MINIBATCH_SIZE = MINIBATCH_SIZE_OPTIONS[0]  # [HYPERPARAMETER TUNING VALUE]
-EPOCH_NUM = EPOCH_NUM_OPTIONS[0]  # [HYPERPARAMETER TUNING VALUE]
+EPOCH_NUM = EPOCH_NUM_OPTIONS[5]  # [HYPERPARAMETER TUNING VALUE]
 REGULARIZATION_STRENGTH = REGULARIZATION_STRENGTH_OPTIONS[0]  # [HYPERPARAMETER TUNING VALUE]
 
 
@@ -115,15 +115,13 @@ def fCE(X, Y, w):
                                       0:n]  # deciding whether or not to "clip" off the bias on yhat (see the [0 to n] )
 
 
+# takes 10 x n one-hot vectors for y and yhat
 def fPC(y, yhat):
-    # eq = y==yhat
     n = y.shape[0]
     y_maxes = np.argmax(y, axis=1)
     yhat_maxes = np.argmax(yhat, axis=1)
     pc = np.count_nonzero(y_maxes == yhat_maxes) / n
     return pc
-
-    # return eq
 
 
 # Given training images X, associated labels Y, and a vector of combined weights
@@ -198,6 +196,7 @@ def train(trainX, trainY, w):
     # out = []
     # file_name = 'HW5_part1.csv'
     global cost, acc
+    descent_step = 0
 
     for i in range(EPOCH_NUM):
         random_inds = np.arange(sample_num)
@@ -217,9 +216,17 @@ def train(trainX, trainY, w):
                     index_index += 1
 
             gradient = gradCE(batch, batch_lables, w)
-            w = w - LEARNING_RATE * gradient  # make element wise
+            w = w - LEARNING_RATE * gradient
+            global cost, acc
+
+            file_name = 'HW5_plot_bus.csv'
+            cost_output = cost
+            acc_output = acc
+            df = pd.DataFrame([descent_step, cost_output, acc_output])
+            df.to_csv(file_name, mode ='a',header = False)
+            descent_step += 1
         global cost, acc
-        #cost, acc, yhat = calc_yhat(trainX, trainY, w)
+        # cost, acc, yhat = calc_yhat(trainX, trainY, w)
         print("Epoch: ", i, "Cross-entropy loss: ", cost, "PCC: ", acc)
 
         # out.append(f)
@@ -245,7 +252,7 @@ def findBestHyperparaneters(trainX, trainY, w):
     print("Number of total iterations: ", total_len)
     start_time = time.time()
     best_w = w
-    best_loss = 1
+    best_cost = 1000000000
     best_NUM_HIDDEN = 0
     best_LEARNING_RATE = 0
     best_MINIBATCH_SIZE = 0
@@ -268,15 +275,15 @@ def findBestHyperparaneters(trainX, trainY, w):
                         REGULARIZATION_STRENGTH = REGULARIZATION_STRENGTH_OPTIONS[e]
                         w = train(trainX[validation_idx], trainY[validation_idx], w)
                         loss = fCE(trainX[validation_idx], trainY[validation_idx], w)[0]
-                        if (loss < best_loss):
-                            best_loss = loss
+                        if (cost < best_cost):
+                            best_cost = cost
                             best_w = w
                             best_NUM_HIDDEN = NUM_HIDDEN
                             best_LEARNING_RATE = LEARNING_RATE
                             best_MINIBATCH_SIZE = MINIBATCH_SIZE
                             best_EPOCH_NUM = EPOCH_NUM
                             best_REGULARIZATION_STRENGTH = REGULARIZATION_STRENGTH
-                            print("New best hyperparameters with loss of: ", best_loss, ". NUM_HIDDEN: ", NUM_HIDDEN,
+                            print("New best hyperparameters with loss of: ", best_cost, ". NUM_HIDDEN: ", NUM_HIDDEN,
                                   " LEARNING_RATE: ", LEARNING_RATE, " MINIBATCH_SIZE: ", MINIBATCH_SIZE,
                                   " EPOCH_NUM: ", EPOCH_NUM, " REGULARIZATION_STRENGTH: ", REGULARIZATION_STRENGTH)
     print("Globals are now set to best hyperameter values out of available options")
@@ -332,4 +339,4 @@ if __name__ == "__main__":
     w = train(trainX, trainY, w)
     findBestHyperparaneters(trainX, trainY, w)
     # Train the network using SGD.
-    #train(trainX, trainY, w)
+    # train(trainX, trainY, w)
