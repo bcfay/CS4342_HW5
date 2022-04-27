@@ -84,15 +84,10 @@ def fCE(X, Y, w):
 
     #print("n= ", n)
     #print("y shape= ", Y.shape)
-    z1 = np.dot(np.hstack((W1, np.atleast_2d(np.ones(W1.shape[0])).T)), X.T)
-    # z1 = np.vstack((z1.T, b1.T))
+    z1 = np.sum(np.dot(np.hstack((W1, np.atleast_2d(np.ones(W1.shape[0])).T)), X.T), axis=1)
     myList = []
-    for sublist in z1:
-        thisRow = []
-        for element in sublist:
-            thisRow.append(relu(element))
-        myList.append(thisRow)
-
+    for element in z1:
+        myList.append(relu(element))
     h1 = np.array(myList)
     z2 = np.dot(W2, h1)
     # z2 = np.vstack((z2.T, b2.T))
