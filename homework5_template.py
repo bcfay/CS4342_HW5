@@ -8,7 +8,7 @@ NUM_INPUT = 784  # Number of input neurons
 NUM_OUTPUT = 10  # Number of output neurons
 NUM_CHECK = 5  # Number of examples on which to check the gradient
 
-GLOBAL_DEBUG = True
+GLOBAL_DEBUG = False
 
 cost = 0.0
 acc = 0.0
@@ -176,9 +176,9 @@ def calc_yhat(X, Y, w):
 
     a = np.dot(W2, W1)
     b = np.dot(W2, b1)
-    yhat = np.multiply(np.dot(a, X.T), (b + b2))
+    yhat = np.multiply(np.dot(a, X.T).T, (b + b2))
 
-    smallSum = np.dot(Y, np.log(yhat))
+    smallSum = np.dot(Y, np.log(yhat).T)
     bigSum = np.sum(smallSum, axis=0)
     loss = (-1 / n) * bigSum
     acc = -1  # TODO calculate
@@ -197,6 +197,7 @@ def train(trainX, trainY, w):
     # graph code
     # out = []
     # file_name = 'HW5_part1.csv'
+    global cost, acc
 
     for i in range(EPOCH_NUM):
         random_inds = np.arange(sample_num)
@@ -329,4 +330,4 @@ if __name__ == "__main__":
     w = train(trainX, trainY, w)
     findBestHyperparaneters(trainX, trainY, w)
     # Train the network using SGD.
-
+    #train(trainX, trainY, w)
