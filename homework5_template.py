@@ -241,9 +241,10 @@ def findBestHyperparaneters(trainX, trainY, w):
     EPOCH_NUM_OPTIONS_len = len(EPOCH_NUM_OPTIONS)
     REGULARIZATION_STRENGTH_OPTIONS_len = len(REGULARIZATION_STRENGTH_OPTIONS)
 
-    total_len = (
-            NUM_HIDDEN_OPTIONS_len * LEARNING_RATE_OPTIONS_len * MINIBATCH_SIZE_OPTIONS_len * EPOCH_NUM_OPTIONS_len * REGULARIZATION_STRENGTH_OPTIONS_len)
+    print("---- FINDING OPTIMAL HYPERPARAMETER VALUES.  ----------")
+    total_len = (NUM_HIDDEN_OPTIONS_len * LEARNING_RATE_OPTIONS_len * MINIBATCH_SIZE_OPTIONS_len * EPOCH_NUM_OPTIONS_len * REGULARIZATION_STRENGTH_OPTIONS_len)
     print("Number of total iterations: ", total_len)
+    iterationCounter = 0
     start_time = time.time()
     best_w = w
     best_cost = 1000000000
@@ -268,8 +269,13 @@ def findBestHyperparaneters(trainX, trainY, w):
                     for e in range(REGULARIZATION_STRENGTH_OPTIONS_len):
                         REGULARIZATION_STRENGTH = REGULARIZATION_STRENGTH_OPTIONS[e]
                         w = train(trainX[validation_idx], trainY[validation_idx], w)
+                        loss = fCE(trainX[validation_idx], trainY[validation_idx], w)[0]
                         if (cost < best_cost):
                             best_cost = cost
+                        print("Iteration ", iterationCounter)
+                        iterationCounter = iterationCounter+1;
+                        if (loss < best_loss):
+                            best_loss = loss
                             best_w = w
                             best_NUM_HIDDEN = NUM_HIDDEN
                             best_LEARNING_RATE = LEARNING_RATE
