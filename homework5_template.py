@@ -21,8 +21,6 @@ EPOCH_NUM = EPOCH_NUM_OPTIONS[0]  # [HYPERPARAMETER TUNING VALUE]
 REGULARIZATION_STRENGTH = REGULARIZATION_STRENGTH_OPTIONS[0]  # [HYPERPARAMETER TUNING VALUE]
 
 
-
-
 # Given a vector w containing all the weights and biased vectors, extract
 # and return the individual weights and biases W1, b1, W2, b2.
 # This is useful for performing a gradient check with check_grad.
@@ -58,7 +56,8 @@ def pack(W1, b1, W2, b2):
 def loadData(which):
     images = np.load("fashion_mnist_{}_images.npy".format(which)).T / 255.
     labels = np.load("fashion_mnist_{}_labels.npy".format(which))
-    sample_num, lable_len = np.shape(images)
+    sample_num, data_len = np.shape(images)
+    lable_len = 10
     labels_OH = np.zeros((sample_num, lable_len))
 
     for i in range(lable_len):
@@ -79,7 +78,7 @@ def fCE(X, Y, w):
     print("n= ", n)
     print("y shape= ", Y.shape)
     # TODO: CALCULATE LOSS
-    z1 = np.dot(W1,X)
+    z1 = np.dot(W1, X)
     z1 = np.vstack((z1.T, b1.T))
     myList = []
     for sublist in z1:
@@ -89,17 +88,18 @@ def fCE(X, Y, w):
         myList.append(thisRow)
 
     h1 = np.array(myList)
-    z2 = np.dot(W2,h1.T)
+    z2 = np.dot(W2, h1.T)
     z2 = np.vstack((z2.T, b2.T))
     yhat = np.exp(z2) / np.sum(np.exp(z2), axis=None)
 
     smallSum = np.sum(np.dot(Y.T, np.log(yhat[0:n])), axis=1)
     bigSum = np.sum(smallSum, axis=0)
-    loss = (-1/n) * bigSum
+    loss = (-1 / n) * bigSum
     acc = -1
 
     cost = loss
-    return cost, acc, z1, h1, W1, W2, yhat[0:n]         #deciding whether or not to "clip" off the bias on yhat (see the [0 to n] )
+    return cost, acc, z1, h1, W1, W2, yhat[
+                                      0:n]  # deciding whether or not to "clip" off the bias on yhat (see the [0 to n] )
 
 
 # Given training images X, associated labels Y, and a vector of combined weights
@@ -110,7 +110,7 @@ def gradCE(X, Y, w):
     W1, b1, W2, b2 = unpack(w)
 
     cost, acc, z1, h1, W1, W2, yhat = fCE(X, Y, w)
-    print("Y shape = ",  Y.shape)
+    print("Y shape = ", Y.shape)
     print("y^hat shape = ", yhat.shape)
     deltaB2 = (yhat - Y)
     deltaW2 = deltaB2 * h1.T
@@ -118,6 +118,7 @@ def gradCE(X, Y, w):
     deltaW1 = deltaB1 * X.T
 
     return pack(deltaW1, deltaB1, deltaW2, deltaB2)
+
 
 def relu(z):
     return max(0.0, z)
@@ -224,6 +225,7 @@ def findBestHyperparaneters(trainX, trainY, w):
     REGULARIZATION_STRENGTH = best_REGULARIZATION_STRENGTH
 
     return best_w
+
 
 if __name__ == "__main__":
     # Load data
