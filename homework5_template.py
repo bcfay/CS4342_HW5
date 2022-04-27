@@ -126,8 +126,8 @@ def gradCE(X, Y, w):
     W1, b1, W2, b2 = unpack(w)
 
     cost, acc, z1, h1, W1, W2, yhat = fCE(X, Y, w)
-    print("Y shape = ", Y.shape)
-    print("y^hat shape = ", yhat.shape)
+    # print("Y shape = ", Y.shape)
+    # print("y^hat shape = ", yhat.shape)
     diff = (yhat - Y.T)
     deltaB2 = np.sum(diff, axis=1)
     deltaW2 = np.dot(diff, h1.T)
@@ -312,14 +312,16 @@ if __name__ == "__main__":
 
     print("Numerical gradient:")
     num_grad = scipy.optimize.approx_fprime(w, lambda w_:fCE(code_test_x, np.atleast_2d(trainY[idxs]), w_)[1], 1e-10)
+    print(num_grad.shape)
     print(num_grad)
     print("Analytical gradient:")
     anal_grad = gradCE(code_test_x, code_test_y, w)
+    print(anal_grad.shape)
     print(anal_grad)
     print("Discrepancy:")
     print(
-        scipy.optimize.check_grad(lambda w_: fCE(np.atleast_2d(trainX[:, idxs]), np.atleast_2d(trainY[idxs]), w_)[0],
-                                  lambda w_: gradCE(np.atleast_2d(trainX[:, idxs]), np.atleast_2d(trainY[idxs]), w_),
+        scipy.optimize.check_grad(lambda w_: fCE(code_test_x, code_test_y, w_)[0],
+                                  lambda w_: gradCE(code_test_x, code_test_y, w_),
                                   w))
 
     w = train(trainX, trainY, w)
