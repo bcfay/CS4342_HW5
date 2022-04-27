@@ -65,7 +65,7 @@ def loadData(which):
             if labels[j] == i:
                 labels_OH[j][i] = 1
 
-    return images, labels_OH
+    return images.T, labels_OH
 
 
 # Given training images X, associated labels Y, and a vector of combined weights
